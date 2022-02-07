@@ -1,0 +1,16 @@
+node_modules/
+/src/**/*.js
+/src/*.js
+/src/**/*.js.map
+/src/*.js.map
+/src/**/*.d.ts.map
+/src/*.d.ts.map
+/src/**/*.d.ts
+/src/*.d.ts
+custom-elements.json
+docs
+# top level source
+my-element.js
+my-element.js.map
+my-element.d.ts
+my-element.d.ts.map
