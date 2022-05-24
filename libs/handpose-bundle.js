@@ -55,77 +55,80 @@ B("Symbol",function(a){function b(g){if(this instanceof b)throw new TypeError("S
 B("Symbol.iterator",function(a){if(a)return a;a=Symbol("Symbol.iterator");for(var b="Array Int8Array Uint8Array Uint8ClampedArray Int16Array Uint16Array Int32Array Uint32Array Float32Array Float64Array".split(" "),c=0;c<b.length;c++){var d=y[b[c]];"function"===typeof d&&"function"!=typeof d.prototype[a]&&ba(d.prototype,a,{configurable:!0,writable:!0,value:function(){return da(aa(this))}});}return a});function da(a){a={next:a};a[Symbol.iterator]=function(){return this};return a}
 function C(a){var b="undefined"!=typeof Symbol&&Symbol.iterator&&a[Symbol.iterator];return b?b.call(a):{next:aa(a)}}function ea(a){if(!(a instanceof Array)){a=C(a);for(var b,c=[];!(b=a.next()).done;)c.push(b.value);a=c;}return a}var fa="function"==typeof Object.create?Object.create:function(a){function b(){}b.prototype=a;return new b},ha;
 if("function"==typeof Object.setPrototypeOf)ha=Object.setPrototypeOf;else {var ia;a:{var ja={a:!0},ka={};try{ka.__proto__=ja;ia=ka.a;break a}catch(a){}ia=!1;}ha=ia?function(a,b){a.__proto__=b;if(a.__proto__!==b)throw new TypeError(a+" is not extensible");return a}:null;}var la=ha;
-function E(a,b){a.prototype=fa(b.prototype);a.prototype.constructor=a;if(la)la(a,b);else for(var c in b)if("prototype"!=c)if(Object.defineProperties){var d=Object.getOwnPropertyDescriptor(b,c);d&&Object.defineProperty(a,c,d);}else a[c]=b[c];a.da=b.prototype;}function ma(){this.l=!1;this.i=null;this.h=void 0;this.g=1;this.s=this.m=0;this.j=null;}function na(a){if(a.l)throw new TypeError("Generator is already running");a.l=!0;}ma.prototype.o=function(a){this.h=a;};
-function oa(a,b){a.j={U:b,V:!0};a.g=a.m||a.s;}ma.prototype.return=function(a){this.j={return:a};this.g=this.s;};function F(a,b,c){a.g=c;return {value:b}}function pa(a){this.g=new ma;this.h=a;}function qa(a,b){na(a.g);var c=a.g.i;if(c)return ra(a,"return"in c?c["return"]:function(d){return {value:d,done:!0}},b,a.g.return);a.g.return(b);return G(a)}
-function ra(a,b,c,d){try{var e=b.call(a.g.i,c);if(!(e instanceof Object))throw new TypeError("Iterator result "+e+" is not an object");if(!e.done)return a.g.l=!1,e;var g=e.value;}catch(f){return a.g.i=null,oa(a.g,f),G(a)}a.g.i=null;d.call(a.g,g);return G(a)}function G(a){for(;a.g.g;)try{var b=a.h(a.g);if(b)return a.g.l=!1,{value:b.value,done:!1}}catch(c){a.g.h=void 0,oa(a.g,c);}a.g.l=!1;if(a.g.j){b=a.g.j;a.g.j=null;if(b.V)throw b.U;return {value:b.return,done:!0}}return {value:void 0,done:!0}}
-function sa(a){this.next=function(b){na(a.g);a.g.i?b=ra(a,a.g.i.next,b,a.g.o):(a.g.o(b),b=G(a));return b};this.throw=function(b){na(a.g);a.g.i?b=ra(a,a.g.i["throw"],b,a.g.o):(oa(a.g,b),b=G(a));return b};this.return=function(b){return qa(a,b)};this[Symbol.iterator]=function(){return this};}function ta(a){function b(d){return a.next(d)}function c(d){return a.throw(d)}return new Promise(function(d,e){function g(f){f.done?d(f.value):Promise.resolve(f.value).then(b,c).then(g,e);}g(a.next());})}
-function H(a){return ta(new sa(new pa(a)))}
-B("Promise",function(a){function b(f){this.h=0;this.i=void 0;this.g=[];this.o=!1;var k=this.j();try{f(k.resolve,k.reject);}catch(h){k.reject(h);}}function c(){this.g=null;}function d(f){return f instanceof b?f:new b(function(k){k(f);})}if(a)return a;c.prototype.h=function(f){if(null==this.g){this.g=[];var k=this;this.i(function(){k.l();});}this.g.push(f);};var e=y.setTimeout;c.prototype.i=function(f){e(f,0);};c.prototype.l=function(){for(;this.g&&this.g.length;){var f=this.g;this.g=[];for(var k=0;k<f.length;++k){var h=
-f[k];f[k]=null;try{h();}catch(l){this.j(l);}}}this.g=null;};c.prototype.j=function(f){this.i(function(){throw f;});};b.prototype.j=function(){function f(l){return function(n){h||(h=!0,l.call(k,n));}}var k=this,h=!1;return {resolve:f(this.C),reject:f(this.l)}};b.prototype.C=function(f){if(f===this)this.l(new TypeError("A Promise cannot resolve to itself"));else if(f instanceof b)this.F(f);else {a:switch(typeof f){case "object":var k=null!=f;break a;case "function":k=!0;break a;default:k=!1;}k?this.v(f):this.m(f);}};
-b.prototype.v=function(f){var k=void 0;try{k=f.then;}catch(h){this.l(h);return}"function"==typeof k?this.G(k,f):this.m(f);};b.prototype.l=function(f){this.s(2,f);};b.prototype.m=function(f){this.s(1,f);};b.prototype.s=function(f,k){if(0!=this.h)throw Error("Cannot settle("+f+", "+k+"): Promise already settled in state"+this.h);this.h=f;this.i=k;2===this.h&&this.D();this.A();};b.prototype.D=function(){var f=this;e(function(){if(f.B()){var k=y.console;"undefined"!==typeof k&&k.error(f.i);}},1);};b.prototype.B=
-function(){if(this.o)return !1;var f=y.CustomEvent,k=y.Event,h=y.dispatchEvent;if("undefined"===typeof h)return !0;"function"===typeof f?f=new f("unhandledrejection",{cancelable:!0}):"function"===typeof k?f=new k("unhandledrejection",{cancelable:!0}):(f=y.document.createEvent("CustomEvent"),f.initCustomEvent("unhandledrejection",!1,!0,f));f.promise=this;f.reason=this.i;return h(f)};b.prototype.A=function(){if(null!=this.g){for(var f=0;f<this.g.length;++f)g.h(this.g[f]);this.g=null;}};var g=new c;b.prototype.F=
-function(f){var k=this.j();f.J(k.resolve,k.reject);};b.prototype.G=function(f,k){var h=this.j();try{f.call(k,h.resolve,h.reject);}catch(l){h.reject(l);}};b.prototype.then=function(f,k){function h(p,m){return "function"==typeof p?function(q){try{l(p(q));}catch(t){n(t);}}:m}var l,n,r=new b(function(p,m){l=p;n=m;});this.J(h(f,l),h(k,n));return r};b.prototype.catch=function(f){return this.then(void 0,f)};b.prototype.J=function(f,k){function h(){switch(l.h){case 1:f(l.i);break;case 2:k(l.i);break;default:throw Error("Unexpected state: "+
-l.h);}}var l=this;null==this.g?g.h(h):this.g.push(h);this.o=!0;};b.resolve=d;b.reject=function(f){return new b(function(k,h){h(f);})};b.race=function(f){return new b(function(k,h){for(var l=C(f),n=l.next();!n.done;n=l.next())d(n.value).J(k,h);})};b.all=function(f){var k=C(f),h=k.next();return h.done?d([]):new b(function(l,n){function r(q){return function(t){p[q]=t;m--;0==m&&l(p);}}var p=[],m=0;do p.push(void 0),m++,d(h.value).J(r(p.length-1),n),h=k.next();while(!h.done)})};return b});
+function D(a,b){a.prototype=fa(b.prototype);a.prototype.constructor=a;if(la)la(a,b);else for(var c in b)if("prototype"!=c)if(Object.defineProperties){var d=Object.getOwnPropertyDescriptor(b,c);d&&Object.defineProperty(a,c,d);}else a[c]=b[c];a.ra=b.prototype;}function ma(){this.l=!1;this.i=null;this.h=void 0;this.g=1;this.u=this.o=0;this.j=null;}function na(a){if(a.l)throw new TypeError("Generator is already running");a.l=!0;}ma.prototype.s=function(a){this.h=a;};
+function oa(a,b){a.j={fa:b,ga:!0};a.g=a.o||a.u;}ma.prototype.return=function(a){this.j={return:a};this.g=this.u;};function F(a,b,c){a.g=c;return {value:b}}function pa(a){this.g=new ma;this.h=a;}function qa(a,b){na(a.g);var c=a.g.i;if(c)return ra(a,"return"in c?c["return"]:function(d){return {value:d,done:!0}},b,a.g.return);a.g.return(b);return G(a)}
+function ra(a,b,c,d){try{var e=b.call(a.g.i,c);if(!(e instanceof Object))throw new TypeError("Iterator result "+e+" is not an object");if(!e.done)return a.g.l=!1,e;var g=e.value;}catch(f){return a.g.i=null,oa(a.g,f),G(a)}a.g.i=null;d.call(a.g,g);return G(a)}function G(a){for(;a.g.g;)try{var b=a.h(a.g);if(b)return a.g.l=!1,{value:b.value,done:!1}}catch(c){a.g.h=void 0,oa(a.g,c);}a.g.l=!1;if(a.g.j){b=a.g.j;a.g.j=null;if(b.ga)throw b.fa;return {value:b.return,done:!0}}return {value:void 0,done:!0}}
+function sa(a){this.next=function(b){na(a.g);a.g.i?b=ra(a,a.g.i.next,b,a.g.s):(a.g.s(b),b=G(a));return b};this.throw=function(b){na(a.g);a.g.i?b=ra(a,a.g.i["throw"],b,a.g.s):(oa(a.g,b),b=G(a));return b};this.return=function(b){return qa(a,b)};this[Symbol.iterator]=function(){return this};}function ta(a){function b(d){return a.next(d)}function c(d){return a.throw(d)}return new Promise(function(d,e){function g(f){f.done?d(f.value):Promise.resolve(f.value).then(b,c).then(g,e);}g(a.next());})}
+function I(a){return ta(new sa(new pa(a)))}
+B("Promise",function(a){function b(f){this.h=0;this.i=void 0;this.g=[];this.s=!1;var h=this.j();try{f(h.resolve,h.reject);}catch(k){h.reject(k);}}function c(){this.g=null;}function d(f){return f instanceof b?f:new b(function(h){h(f);})}if(a)return a;c.prototype.h=function(f){if(null==this.g){this.g=[];var h=this;this.i(function(){h.l();});}this.g.push(f);};var e=y.setTimeout;c.prototype.i=function(f){e(f,0);};c.prototype.l=function(){for(;this.g&&this.g.length;){var f=this.g;this.g=[];for(var h=0;h<f.length;++h){var k=
+f[h];f[h]=null;try{k();}catch(l){this.j(l);}}}this.g=null;};c.prototype.j=function(f){this.i(function(){throw f;});};b.prototype.j=function(){function f(l){return function(m){k||(k=!0,l.call(h,m));}}var h=this,k=!1;return {resolve:f(this.D),reject:f(this.l)}};b.prototype.D=function(f){if(f===this)this.l(new TypeError("A Promise cannot resolve to itself"));else if(f instanceof b)this.H(f);else {a:switch(typeof f){case "object":var h=null!=f;break a;case "function":h=!0;break a;default:h=!1;}h?this.A(f):this.o(f);}};
+b.prototype.A=function(f){var h=void 0;try{h=f.then;}catch(k){this.l(k);return}"function"==typeof h?this.I(h,f):this.o(f);};b.prototype.l=function(f){this.u(2,f);};b.prototype.o=function(f){this.u(1,f);};b.prototype.u=function(f,h){if(0!=this.h)throw Error("Cannot settle("+f+", "+h+"): Promise already settled in state"+this.h);this.h=f;this.i=h;2===this.h&&this.G();this.B();};b.prototype.G=function(){var f=this;e(function(){if(f.C()){var h=y.console;"undefined"!==typeof h&&h.error(f.i);}},1);};b.prototype.C=
+function(){if(this.s)return !1;var f=y.CustomEvent,h=y.Event,k=y.dispatchEvent;if("undefined"===typeof k)return !0;"function"===typeof f?f=new f("unhandledrejection",{cancelable:!0}):"function"===typeof h?f=new h("unhandledrejection",{cancelable:!0}):(f=y.document.createEvent("CustomEvent"),f.initCustomEvent("unhandledrejection",!1,!0,f));f.promise=this;f.reason=this.i;return k(f)};b.prototype.B=function(){if(null!=this.g){for(var f=0;f<this.g.length;++f)g.h(this.g[f]);this.g=null;}};var g=new c;b.prototype.H=
+function(f){var h=this.j();f.M(h.resolve,h.reject);};b.prototype.I=function(f,h){var k=this.j();try{f.call(h,k.resolve,k.reject);}catch(l){k.reject(l);}};b.prototype.then=function(f,h){function k(p,n){return "function"==typeof p?function(q){try{l(p(q));}catch(t){m(t);}}:n}var l,m,r=new b(function(p,n){l=p;m=n;});this.M(k(f,l),k(h,m));return r};b.prototype.catch=function(f){return this.then(void 0,f)};b.prototype.M=function(f,h){function k(){switch(l.h){case 1:f(l.i);break;case 2:h(l.i);break;default:throw Error("Unexpected state: "+
+l.h);}}var l=this;null==this.g?g.h(k):this.g.push(k);this.s=!0;};b.resolve=d;b.reject=function(f){return new b(function(h,k){k(f);})};b.race=function(f){return new b(function(h,k){for(var l=C(f),m=l.next();!m.done;m=l.next())d(m.value).M(h,k);})};b.all=function(f){var h=C(f),k=h.next();return k.done?d([]):new b(function(l,m){function r(q){return function(t){p[q]=t;n--;0==n&&l(p);}}var p=[],n=0;do p.push(void 0),n++,d(k.value).M(r(p.length-1),m),k=h.next();while(!k.done)})};return b});
 function ua(a,b){a instanceof String&&(a+="");var c=0,d=!1,e={next:function(){if(!d&&c<a.length){var g=c++;return {value:b(g,a[g]),done:!1}}d=!0;return {done:!0,value:void 0}}};e[Symbol.iterator]=function(){return e};return e}var va="function"==typeof Object.assign?Object.assign:function(a,b){for(var c=1;c<arguments.length;c++){var d=arguments[c];if(d)for(var e in d)Object.prototype.hasOwnProperty.call(d,e)&&(a[e]=d[e]);}return a};B("Object.assign",function(a){return a||va});
 B("Object.is",function(a){return a?a:function(b,c){return b===c?0!==b||1/b===1/c:b!==b&&c!==c}});B("Array.prototype.includes",function(a){return a?a:function(b,c){var d=this;d instanceof String&&(d=String(d));var e=d.length;c=c||0;for(0>c&&(c=Math.max(c+e,0));c<e;c++){var g=d[c];if(g===b||Object.is(g,b))return !0}return !1}});
 B("String.prototype.includes",function(a){return a?a:function(b,c){if(null==this)throw new TypeError("The 'this' value for String.prototype.includes must not be null or undefined");if(b instanceof RegExp)throw new TypeError("First argument to String.prototype.includes must not be a regular expression");return -1!==this.indexOf(b,c||0)}});B("Array.prototype.keys",function(a){return a?a:function(){return ua(this,function(b){return b})}});var wa=this||self;
-function J(a,b){a=a.split(".");var c=wa;a[0]in c||"undefined"==typeof c.execScript||c.execScript("var "+a[0]);for(var d;a.length&&(d=a.shift());)a.length||void 0===b?c[d]&&c[d]!==Object.prototype[d]?c=c[d]:c=c[d]={}:c[d]=b;}function xa(a){wa.setTimeout(function(){throw a;},0);}function K(a){xa(a);return;}function ya(a,b){K(Error("Invalid wire type: "+a+" (at position "+b+")"));}function za(){K(Error("Failed to read varint, encoding is invalid."));}function Aa(a,b){b=String.fromCharCode.apply(null,b);return null==a?b:a+b}var Ba,Ca="undefined"!==typeof TextDecoder,Da,Ea="undefined"!==typeof TextEncoder;
-function Fa(a){if(Ea)a=(Da||(Da=new TextEncoder)).encode(a);else {var b=void 0;b=void 0===b?!1:b;for(var c=0,d=new Uint8Array(3*a.length),e=0;e<a.length;e++){var g=a.charCodeAt(e);if(128>g)d[c++]=g;else {if(2048>g)d[c++]=g>>6|192;else {if(55296<=g&&57343>=g){if(56319>=g&&e<a.length){var f=a.charCodeAt(++e);if(56320<=f&&57343>=f){g=1024*(g-55296)+f-56320+65536;d[c++]=g>>18|240;d[c++]=g>>12&63|128;d[c++]=g>>6&63|128;d[c++]=g&63|128;continue}else e--;}if(b)throw Error("Found an unpaired surrogate");g=65533;}d[c++]=
-g>>12|224;d[c++]=g>>6&63|128;}d[c++]=g&63|128;}}a=d.subarray(0,c);}return a}var Ga={},L=null;function Ha(a){var b;void 0===b&&(b=0);Ia();b=Ga[b];for(var c=Array(Math.floor(a.length/3)),d=b[64]||"",e=0,g=0;e<a.length-2;e+=3){var f=a[e],k=a[e+1],h=a[e+2],l=b[f>>2];f=b[(f&3)<<4|k>>4];k=b[(k&15)<<2|h>>6];h=b[h&63];c[g++]=l+f+k+h;}l=0;h=d;switch(a.length-e){case 2:l=a[e+1],h=b[(l&15)<<2]||d;case 1:a=a[e],c[g]=b[a>>2]+b[(a&3)<<4|l>>4]+h+d;}return c.join("")}
-function Ja(a){var b=a.length,c=3*b/4;c%3?c=Math.floor(c):-1!="=.".indexOf(a[b-1])&&(c=-1!="=.".indexOf(a[b-2])?c-2:c-1);var d=new Uint8Array(c),e=0;Ka(a,function(g){d[e++]=g;});return d.subarray(0,e)}
-function Ka(a,b){function c(h){for(;d<a.length;){var l=a.charAt(d++),n=L[l];if(null!=n)return n;if(!/^[\s\xa0]*$/.test(l))throw Error("Unknown base64 encoding at char: "+l);}return h}Ia();for(var d=0;;){var e=c(-1),g=c(0),f=c(64),k=c(64);if(64===k&&-1===e)break;b(e<<2|g>>4);64!=f&&(b(g<<4&240|f>>2),64!=k&&b(f<<6&192|k));}}
-function Ia(){if(!L){L={};for(var a="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".split(""),b=["+/=","+/","-_=","-_.","-_"],c=0;5>c;c++){var d=a.concat(b[c].split(""));Ga[c]=d;for(var e=0;e<d.length;e++){var g=d[e];void 0===L[g]&&(L[g]=e);}}}}var La="function"===typeof Uint8Array,Ma;function Na(a){this.g=a;if(null!==a&&0===a.length)throw Error("ByteString should be constructed with non-empty values");}Na.prototype.toJSON=function(){if(null==this.g)var a="";else a=this.g,a=this.g=null==a||"string"===typeof a?a:La&&a instanceof Uint8Array?Ha(a):null;return a};var Oa="function"===typeof Uint8Array.prototype.slice;function Pa(a,b,c){return b===c?Ma||(Ma=new Uint8Array(0)):Oa?a.slice(b,c):new Uint8Array(a.subarray(b,c))}var M=0,N=0;
-function Qa(a){if(a.constructor===Uint8Array)return a;if(a.constructor===ArrayBuffer)return new Uint8Array(a);if(a.constructor===Array)return new Uint8Array(a);if(a.constructor===String)return Ja(a);if(a.constructor===Na){if(null==a.g)var b=Ma||(Ma=new Uint8Array(0));else {b=Uint8Array;var c=a.g;c=null==c||La&&null!=c&&c instanceof Uint8Array?c:"string"===typeof c?Ja(c):null;a=a.g=c;b=new b(a);}return b}if(a instanceof Uint8Array)return new Uint8Array(a.buffer,a.byteOffset,a.byteLength);throw Error("Type not convertible to a Uint8Array, expected a Uint8Array, an ArrayBuffer, a base64 encoded string, or Array of numbers");
-}function Ra(a,b){b=void 0===b?{}:b;b=void 0===b.u?!1:b.u;this.h=null;this.g=this.i=this.l=0;this.j=!1;this.u=b;a&&Sa(this,a);}function Sa(a,b){a.h=Qa(b);a.l=0;a.i=a.h.length;a.g=a.l;}Ra.prototype.reset=function(){this.g=this.l;};function O(a){a.g>a.i&&(a.j=!0,K(Error("Tried to read past the end of the data "+a.g+" > "+a.i)));}
-function P(a){var b=a.h,c=b[a.g],d=c&127;if(128>c)return a.g+=1,O(a),d;c=b[a.g+1];d|=(c&127)<<7;if(128>c)return a.g+=2,O(a),d;c=b[a.g+2];d|=(c&127)<<14;if(128>c)return a.g+=3,O(a),d;c=b[a.g+3];d|=(c&127)<<21;if(128>c)return a.g+=4,O(a),d;c=b[a.g+4];d|=(c&15)<<28;if(128>c)return a.g+=5,O(a),d>>>0;a.g+=5;if(128<=b[a.g++]&&128<=b[a.g++]&&128<=b[a.g++]&&128<=b[a.g++]&&128<=b[a.g++])return a.j=!0,za(),d;O(a);return d}var Ta=[];function Ua(){this.g=new Uint8Array(64);this.h=0;}function Q(a,b){if(!(a.h+1<a.g.length)){var c=a.g;a.g=new Uint8Array(Math.ceil(1+2*a.g.length));a.g.set(c);}a.g[a.h++]=b;}Ua.prototype.length=function(){return this.h};Ua.prototype.end=function(){var a=this.g,b=this.h;this.h=0;return Pa(a,0,b)};function S(a,b){for(;127<b;)Q(a,b&127|128),b>>>=7;Q(a,b);}function Va(a){var b={},c=void 0===b.N?!1:b.N;this.m={u:void 0===b.u?!1:b.u};this.N=c;b=this.m;Ta.length?(c=Ta.pop(),b&&(c.u=b.u),a&&Sa(c,a),a=c):a=new Ra(a,b);this.g=a;this.l=this.g.g;this.h=this.i=-1;this.j=!1;}Va.prototype.reset=function(){this.g.reset();this.h=this.i=-1;};function Wa(a){var b=a.g;(b=b.g==b.i)||(b=a.j)||(b=a.g,b=b.j||0>b.g||b.g>b.i);if(b)return !1;a.l=a.g.g;var c=P(a.g);b=c>>>3;c&=7;if(!(0<=c&&5>=c))return a.j=!0,ya(c,a.l),!1;a.i=b;a.h=c;return !0}
-function Xa(a){switch(a.h){case 0:if(0!=a.h)Xa(a);else a:{a=a.g;for(var b=a.g,c=0;10>c;c++){if(0===(a.h[b]&128)){a.g=b+1;O(a);break a}b++;}a.j=!0;za();}break;case 1:a=a.g;a.g+=8;O(a);break;case 2:2!=a.h?Xa(a):(b=P(a.g),a=a.g,a.g+=b,O(a));break;case 5:a=a.g;a.g+=4;O(a);break;case 3:b=a.i;do{if(!Wa(a)){a.j=!0;K(Error("Unmatched start-group tag: stream EOF"));break}if(4==a.h){a.i!=b&&(a.j=!0,K(Error("Unmatched end-group tag")));break}Xa(a);}while(1);break;default:a.j=!0,ya(a.h,a.l);}}
-function Ya(a,b,c){a.N||(a=Pa(a.g.h,c,a.g.g),(c=b.m)?c.push(a):b.m=[a]);}var Za=[];function $a(){this.h=[];this.i=0;this.g=new Ua;}function ab(a,b){0!==b.length&&(a.h.push(b),a.i+=b.length);}function bb(a,b,c){S(a.g,8*b+2);S(a.g,c.length);ab(a,a.g.end());ab(a,c);}var cb="function"===typeof Symbol&&"symbol"===typeof Symbol()?Symbol(void 0):void 0;function db(a,b){Object.isFrozen(a)||(cb?a[cb]|=b:void 0!==a.g?a.g|=b:Object.defineProperties(a,{g:{value:b,configurable:!0,writable:!0,enumerable:!1}}));}function eb(a){if(!a)return 0;var b;cb?b=a[cb]:b=a.g;return null==b?0:b}function fb(a){if(!Array.isArray(a))return a;db(a,1);return a}function gb(a){if(!Array.isArray(a))throw Error("cannot mark non-array as immutable");db(a,2);}function hb(a){return null!==a&&"object"===typeof a&&a.constructor===Object}function ib(a){switch(typeof a){case "number":return isFinite(a)?a:String(a);case "object":return La&&null!=a&&a instanceof Uint8Array?Ha(a):a;default:return a}}function jb(a,b){if(null!=a)return Array.isArray(a)||hb(a)?kb(a,b):b(a)}function kb(a,b){if(Array.isArray(a)){for(var c=Array(a.length),d=0;d<a.length;d++)c[d]=jb(a[d],b);eb(a)&1&&fb(c);return c}c={};for(d in a)c[d]=jb(a[d],b);return c}var lb;function T(a,b,c){var d=lb;lb=null;a||(a=d);d=this.constructor.ba;a||(a=d?[d]:[]);this.j=(d?0:-1)-(this.constructor.$||0);this.i=null;this.g=a;a:{d=this.g.length;a=d-1;if(d&&(d=this.g[a],hb(d))){this.l=a-this.j;this.h=d;break a}void 0!==b&&-1<b?(this.l=Math.max(b,a+1-this.j),this.h=null):this.l=Number.MAX_VALUE;}if(c)for(b=0;b<c.length;b++)a=c[b],a<this.l?(a+=this.j,(d=this.g[a])?fb(d):this.g[a]=mb):(nb(this),(d=this.h[a])?fb(d):this.h[a]=mb);}var mb=Object.freeze(fb([]));
-function nb(a){var b=a.l+a.j;a.g[b]||(a.h=a.g[b]={});}function U(a,b,c){return -1===b?null:(void 0===c?0:c)||b>=a.l?a.h?a.h[b]:void 0:a.g[b+a.j]}function ob(a,b,c){c=void 0===c?!0:c;var d=void 0===d?!1:d;var e=U(a,b,d);null==e&&(e=mb);e===mb?(e=fb([]),V(a,b,e,d)):c&&Array.isArray(e)&&eb(e)&2&&(e=e.slice(),V(a,b,e,d));return e}function W(a,b,c){a=U(a,b);a=null==a?a:+a;return null==a?void 0===c?0:c:a}function V(a,b,c,d){(void 0===d?0:d)||b>=a.l?(nb(a),a.h[b]=c):a.g[b+a.j]=c;}
-function pb(a,b,c){a.i||(a.i={});var d=a.i[c];if(!d){var e=ob(a,c,!1);d=[];for(var g=Array.isArray(e)?!!(eb(e)&2):!1,f=0;f<e.length;f++)d[f]=new b(e[f]),g&&gb(d[f].g);g&&(gb(d),Object.freeze(d));a.i[c]=d;}return d}function qb(a,b,c,d,e){var g=pb(a,d,b);c=c?c:new d;a=ob(a,b);void 0!=e?(g.splice(e,0,c),a.splice(e,0,X(c))):(g.push(c),a.push(X(c)));}T.prototype.toJSON=function(){var a=X(this);return kb(a,ib)};
-function X(a){if(a.i)for(var b in a.i){var c=a.i[b];if(Array.isArray(c))for(var d=0;d<c.length;d++)c[d]&&X(c[d]);else c&&X(c);}return a.g}T.prototype.toString=function(){return X(this).toString()};function rb(a,b){a=U(a,b);return null==a?0:a}function sb(a,b){a=U(a,b);return null==a?"":a}function tb(a,b){if(a=a.m){ab(b,b.g.end());for(var c=0;c<a.length;c++)ab(b,a[c]);}}function ub(a){var b=a[0];switch(a.length){case 2:var c=a[1];return function(h,l,n){return b(h,l,n,c)};case 3:var d=a[1],e=a[2];return function(h,l,n){return b(h,l,n,d,e)};case 4:var g=a[1],f=a[2],k=a[3];return function(h,l,n){return b(h,l,n,g,f,k)};default:throw Error("unsupported number of parameters, expected [2-4], got "+a.length);}}
-function vb(a,b,c){for(;Wa(b)&&4!=b.h;){var d=b.i,e=c[d];if(e){if(Array.isArray(e)&&(e=c[d]=ub(e)),!e(b,a,d)){d=b;e=a;var g=d.l;Xa(d);Ya(d,e,g);}}else d=b,e=a,g=d.l,Xa(d),Ya(d,e,g);}return a}function wb(a,b){var c=new $a;b(a,c);a=c.i+c.g.length();if(0===a)c=new Uint8Array(0);else {a=new Uint8Array(a);for(var d=c.h,e=d.length,g=b=0;g<e;g++){var f=d[g];0!==f.length&&(a.set(f,b),b+=f.length);}d=c.g;e=d.h;0!==e&&(a.set(d.g.subarray(0,e),b),d.h=0);c.h=[a];c=a;}return c}
-function xb(a,b,c){if(Za.length){var d=Za.pop();a&&(Sa(d.g,a),d.i=-1,d.h=-1);a=d;}else a=new Va(a);try{return c(new b,a)}finally{b=a.g,b.h=null,b.l=0,b.i=0,b.g=0,b.j=!1,b.u=!1,a.i=-1,a.h=-1,a.j=!1,100>Za.length&&Za.push(a);}}
-function Y(a,b,c){b=U(b,c);if(null!=b){S(a.g,8*c+5);a=a.g;var d=b;d=(c=0>d?1:0)?-d:d;0===d?0<1/d?M=N=0:(N=0,M=2147483648):isNaN(d)?(N=0,M=2147483647):3.4028234663852886E38<d?(N=0,M=(c<<31|2139095040)>>>0):1.1754943508222875E-38>d?(d=Math.round(d/Math.pow(2,-149)),N=0,M=(c<<31|d)>>>0):(b=Math.floor(Math.log(d)/Math.LN2),d*=Math.pow(2,-b),d=Math.round(8388608*d),16777216<=d&&++b,N=0,M=(c<<31|b+127<<23|d&8388607)>>>0);c=M;Q(a,c>>>0&255);Q(a,c>>>8&255);Q(a,c>>>16&255);Q(a,c>>>24&255);}}
-function Z(a,b,c){if(5!==a.h)return !1;a=a.g;var d=a.h[a.g];var e=a.h[a.g+1];var g=a.h[a.g+2],f=a.h[a.g+3];a.g+=4;O(a);e=(d<<0|e<<8|g<<16|f<<24)>>>0;a=2*(e>>31)+1;d=e>>>23&255;e&=8388607;V(b,c,255==d?e?NaN:Infinity*a:0==d?a*Math.pow(2,-149)*e:a*Math.pow(2,d-150)*(e+Math.pow(2,23)));return !0}
-function yb(a,b,c){if(0!==a.h)return !1;for(var d=a.g,e=128,g=0,f=a=0;4>f&&128<=e;f++)e=d.h[d.g++],g|=(e&127)<<7*f;128<=e&&(e=d.h[d.g++],g|=(e&127)<<28,a|=(e&127)>>4);if(128<=e)for(f=0;5>f&&128<=e;f++)e=d.h[d.g++],a|=(e&127)<<7*f+3;if(128>e){d=g>>>0;e=a>>>0;if(a=e&2147483648)d=~d+1>>>0,e=~e>>>0,0==d&&(e=e+1>>>0);d=4294967296*e+(d>>>0);a=a?-d:d;}else d.j=!0,za(),a=void 0;V(b,c,a);return !0}function zb(a,b,c){if(0!==a.h)return !1;V(b,c,P(a.g));return !0}
-function Ab(a,b,c){if(2!==a.h)return !1;var d=P(a.g);a=a.g;var e=a.g;a.g+=d;O(a);a=a.h;var g;if(Ca)(g=Ba)||(g=Ba=new TextDecoder("utf-8",{fatal:!1})),g=g.decode(a.subarray(e,e+d));else {d=e+d;for(var f=[],k=null,h,l,n;e<d;)h=a[e++],128>h?f.push(h):224>h?e>=d?f.push(65533):(l=a[e++],194>h||128!==(l&192)?(e--,f.push(65533)):f.push((h&31)<<6|l&63)):240>h?e>=d-1?f.push(65533):(l=a[e++],128!==(l&192)||224===h&&160>l||237===h&&160<=l||128!==((g=a[e++])&192)?(e--,f.push(65533)):f.push((h&15)<<12|(l&63)<<6|
-g&63)):244>=h?e>=d-2?f.push(65533):(l=a[e++],128!==(l&192)||0!==(h<<28)+(l-144)>>30||128!==((g=a[e++])&192)||128!==((n=a[e++])&192)?(e--,f.push(65533)):(h=(h&7)<<18|(l&63)<<12|(g&63)<<6|n&63,h-=65536,f.push((h>>10&1023)+55296,(h&1023)+56320))):f.push(65533),8192<=f.length&&(k=Aa(k,f),f.length=0);g=Aa(k,f);}V(b,c,g);return !0}
-function Bb(a,b,c,d,e){if(2!==a.h)return !1;var g=new d,f=a.g.i,k=P(a.g),h=a.g.g+k;a.g.i=h;e(g,a);e=h-a.g.g;if(0!==e)throw Error("Message parsing ended unexpectedly. Expected to read "+(k+" bytes, instead read "+(k-e)+" bytes, either the data ended unexpectedly or the message misreported its own length"));a.g.g=h;a.g.i=f;qb(b,c,g,d,void 0);return !0}function Cb(a){T.call(this,a);}var Db;E(Cb,T);function Eb(a,b){var c=U(a,1);if(null!=c&&null!=c){S(b.g,8);var d=b.g;if(0<=c)S(d,c);else {for(var e=0;9>e;e++)Q(d,c&127|128),c>>=7;Q(d,1);}}Y(b,a,2);d=U(a,3);null!=d&&bb(b,3,Fa(d));d=U(a,4);null!=d&&bb(b,4,Fa(d));tb(a,b);}function Fb(a,b){return vb(a,b,Db||(Db={1:zb,2:Z,3:Ab,4:Ab}))}function Gb(a){T.call(this,a,-1,Hb);}var Ib;E(Gb,T);Gb.prototype.addClassification=function(a,b){qb(this,1,a,Cb,b);return this};function Jb(a,b){return vb(a,b,Ib||(Ib={1:[Bb,Cb,Fb]}))}var Hb=[1];function Kb(a){T.call(this,a);}var Lb;E(Kb,T);function Mb(a,b){Y(b,a,1);Y(b,a,2);Y(b,a,3);Y(b,a,4);Y(b,a,5);tb(a,b);}function Nb(a,b){return vb(a,b,Lb||(Lb={1:Z,2:Z,3:Z,4:Z,5:Z}))}function Ob(a){T.call(this,a,-1,Pb);}var Qb;E(Ob,T);function Rb(a,b){return vb(a,b,Qb||(Qb={1:[Bb,Kb,Nb]}))}var Pb=[1];function Sb(a){T.call(this,a);}var Tb;E(Sb,T);function Ub(a,b){Y(b,a,1);Y(b,a,2);Y(b,a,3);Y(b,a,4);Y(b,a,5);var c=U(a,6);if(null!=c&&null!=c){S(b.g,48);var d=b.g,e=c;c=0>e;e=Math.abs(e);var g=e>>>0;e=Math.floor((e-g)/4294967296);e>>>=0;c&&(e=~e>>>0,g=(~g>>>0)+1,4294967295<g&&(g=0,e++,4294967295<e&&(e=0)));M=g;N=e;c=M;for(g=N;0<g||127<c;)Q(d,c&127|128),c=(c>>>7|g<<25)>>>0,g>>>=7;Q(d,c);}tb(a,b);}function Vb(a,b){return vb(a,b,Tb||(Tb={1:Z,2:Z,3:Z,4:Z,5:Z,6:yb}))}function Wb(a,b,c){c=a.createShader(0===c?a.VERTEX_SHADER:a.FRAGMENT_SHADER);a.shaderSource(c,b);a.compileShader(c);if(!a.getShaderParameter(c,a.COMPILE_STATUS))throw Error("Could not compile WebGL shader.\n\n"+a.getShaderInfoLog(c));return c}function Xb(a){return pb(a,Cb,1).map(function(b){return {index:rb(b,1),score:W(b,2),label:null!=U(b,3)?sb(b,3):void 0,displayName:null!=U(b,4)?sb(b,4):void 0}})}function Yb(a){return {x:W(a,1),y:W(a,2),z:W(a,3),visibility:null!=U(a,4)?W(a,4):void 0}}function Zb(a){return a.map(function(b){return pb(xb(b,Ob,Rb),Kb,1).map(Yb)})}function $b(a,b){this.h=a;this.g=b;this.l=0;}
-function ac(a,b,c){bc(a,b);if("function"===typeof a.g.canvas.transferToImageBitmap)return Promise.resolve(a.g.canvas.transferToImageBitmap());if(c)return Promise.resolve(a.g.canvas);if("function"===typeof createImageBitmap)return createImageBitmap(a.g.canvas);void 0===a.i&&(a.i=document.createElement("canvas"));return new Promise(function(d){a.i.height=a.g.canvas.height;a.i.width=a.g.canvas.width;a.i.getContext("2d",{}).drawImage(a.g.canvas,0,0,a.g.canvas.width,a.g.canvas.height);d(a.i);})}
-function bc(a,b){var c=a.g;if(void 0===a.m){var d=Wb(c,"\n  attribute vec2 aVertex;\n  attribute vec2 aTex;\n  varying vec2 vTex;\n  void main(void) {\n    gl_Position = vec4(aVertex, 0.0, 1.0);\n    vTex = aTex;\n  }",0),e=Wb(c,"\n  precision mediump float;\n  varying vec2 vTex;\n  uniform sampler2D sampler0;\n  void main(){\n    gl_FragColor = texture2D(sampler0, vTex);\n  }",1),g=c.createProgram();c.attachShader(g,d);c.attachShader(g,e);c.linkProgram(g);if(!c.getProgramParameter(g,c.LINK_STATUS))throw Error("Could not compile WebGL program.\n\n"+
-c.getProgramInfoLog(g));d=a.m=g;c.useProgram(d);e=c.getUniformLocation(d,"sampler0");a.j={I:c.getAttribLocation(d,"aVertex"),H:c.getAttribLocation(d,"aTex"),ca:e};a.s=c.createBuffer();c.bindBuffer(c.ARRAY_BUFFER,a.s);c.enableVertexAttribArray(a.j.I);c.vertexAttribPointer(a.j.I,2,c.FLOAT,!1,0,0);c.bufferData(c.ARRAY_BUFFER,new Float32Array([-1,-1,-1,1,1,1,1,-1]),c.STATIC_DRAW);c.bindBuffer(c.ARRAY_BUFFER,null);a.o=c.createBuffer();c.bindBuffer(c.ARRAY_BUFFER,a.o);c.enableVertexAttribArray(a.j.H);c.vertexAttribPointer(a.j.H,
-2,c.FLOAT,!1,0,0);c.bufferData(c.ARRAY_BUFFER,new Float32Array([0,1,0,0,1,0,1,1]),c.STATIC_DRAW);c.bindBuffer(c.ARRAY_BUFFER,null);c.uniform1i(e,0);}d=a.j;c.useProgram(a.m);c.canvas.width=b.width;c.canvas.height=b.height;c.viewport(0,0,b.width,b.height);c.activeTexture(c.TEXTURE0);a.h.bindTexture2d(b.glName);c.enableVertexAttribArray(d.I);c.bindBuffer(c.ARRAY_BUFFER,a.s);c.vertexAttribPointer(d.I,2,c.FLOAT,!1,0,0);c.enableVertexAttribArray(d.H);c.bindBuffer(c.ARRAY_BUFFER,a.o);c.vertexAttribPointer(d.H,
-2,c.FLOAT,!1,0,0);c.bindFramebuffer(c.DRAW_FRAMEBUFFER?c.DRAW_FRAMEBUFFER:c.FRAMEBUFFER,null);c.clearColor(0,0,0,0);c.clear(c.COLOR_BUFFER_BIT);c.colorMask(!0,!0,!0,!0);c.drawArrays(c.TRIANGLE_FAN,0,4);c.disableVertexAttribArray(d.I);c.disableVertexAttribArray(d.H);c.bindBuffer(c.ARRAY_BUFFER,null);a.h.bindTexture2d(0);}function cc(a){this.g=a;}var dc=new Uint8Array([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,2,1,0,10,9,1,7,0,65,0,253,15,26,11]);function ec(a,b){return b+a}function fc(a,b){window[a]=b;}function gc(a){var b=document.createElement("script");b.setAttribute("src",a);b.setAttribute("crossorigin","anonymous");return new Promise(function(c){b.addEventListener("load",function(){c();},!1);b.addEventListener("error",function(){c();},!1);document.body.appendChild(b);})}
-function hc(){return H(function(a){switch(a.g){case 1:return a.m=2,F(a,WebAssembly.instantiate(dc),4);case 4:a.g=3;a.m=0;break;case 2:return a.m=0,a.j=null,a.return(!1);case 3:return a.return(!0)}})}
-function ic(a){this.g=a;this.listeners={};this.j={};this.F={};this.m={};this.s={};this.G=this.o=this.R=!0;this.C=Promise.resolve();this.P="";this.B={};this.locateFile=a&&a.locateFile||ec;if("object"===typeof window)var b=window.location.pathname.toString().substring(0,window.location.pathname.toString().lastIndexOf("/"))+"/";else if("undefined"!==typeof location)b=location.pathname.toString().substring(0,location.pathname.toString().lastIndexOf("/"))+"/";else throw Error("solutions can only be loaded on a web page or in a web worker");
-this.S=b;if(a.options){b=C(Object.keys(a.options));for(var c=b.next();!c.done;c=b.next()){c=c.value;var d=a.options[c].default;void 0!==d&&(this.j[c]="function"===typeof d?d():d);}}}x=ic.prototype;x.close=function(){this.i&&this.i.delete();return Promise.resolve()};
-function jc(a){var b,c,d,e,g,f,k,h,l,n,r;return H(function(p){switch(p.g){case 1:if(!a.R)return p.return();b=void 0===a.g.files?[]:"function"===typeof a.g.files?a.g.files(a.j):a.g.files;return F(p,hc(),2);case 2:c=p.h;if("object"===typeof window)return fc("createMediapipeSolutionsWasm",{locateFile:a.locateFile}),fc("createMediapipeSolutionsPackedAssets",{locateFile:a.locateFile}),f=b.filter(function(m){return void 0!==m.data}),k=b.filter(function(m){return void 0===m.data}),h=Promise.all(f.map(function(m){var q=
-kc(a,m.url);if(void 0!==m.path){var t=m.path;q=q.then(function(w){a.overrideFile(t,w);return Promise.resolve(w)});}return q})),l=Promise.all(k.map(function(m){return void 0===m.simd||m.simd&&c||!m.simd&&!c?gc(a.locateFile(m.url,a.S)):Promise.resolve()})).then(function(){var m,q,t;return H(function(w){if(1==w.g)return m=window.createMediapipeSolutionsWasm,q=window.createMediapipeSolutionsPackedAssets,t=a,F(w,m(q),2);t.h=w.h;w.g=0;})}),n=function(){return H(function(m){a.g.graph&&a.g.graph.url?m=F(m,
-kc(a,a.g.graph.url),0):(m.g=0,m=void 0);return m})}(),F(p,Promise.all([l,h,n]),7);if("function"!==typeof importScripts)throw Error("solutions can only be loaded on a web page or in a web worker");d=b.filter(function(m){return void 0===m.simd||m.simd&&c||!m.simd&&!c}).map(function(m){return a.locateFile(m.url,a.S)});importScripts.apply(null,ea(d));e=a;return F(p,createMediapipeSolutionsWasm(Module),6);case 6:e.h=p.h;a.l=new OffscreenCanvas(1,1);a.h.canvas=a.l;g=a.h.GL.createContext(a.l,{antialias:!1,
-alpha:!1,aa:"undefined"!==typeof WebGL2RenderingContext?2:1});a.h.GL.makeContextCurrent(g);p.g=4;break;case 7:a.l=document.createElement("canvas");r=a.l.getContext("webgl2",{});if(!r&&(r=a.l.getContext("webgl",{}),!r))return alert("Failed to create WebGL canvas context when passing video frame."),p.return();a.D=r;a.h.canvas=a.l;a.h.createContext(a.l,!0,!0,{});case 4:a.i=new a.h.SolutionWasm,a.R=!1,p.g=0;}})}
-function lc(a){var b,c,d,e,g,f,k,h;return H(function(l){if(1==l.g){if(a.g.graph&&a.g.graph.url&&a.P===a.g.graph.url)return l.return();a.o=!0;if(!a.g.graph||!a.g.graph.url){l.g=2;return}a.P=a.g.graph.url;return F(l,kc(a,a.g.graph.url),3)}2!=l.g&&(b=l.h,a.i.loadGraph(b));c=C(Object.keys(a.B));for(d=c.next();!d.done;d=c.next())e=d.value,a.i.overrideFile(e,a.B[e]);a.B={};if(a.g.listeners)for(g=C(a.g.listeners),f=g.next();!f.done;f=g.next())k=f.value,mc(a,k);h=a.j;a.j={};a.setOptions(h);l.g=0;})}
-x.reset=function(){var a=this;return H(function(b){a.i&&(a.i.reset(),a.m={},a.s={});b.g=0;})};
-x.setOptions=function(a,b){var c=this;if(b=b||this.g.options){for(var d=[],e=[],g={},f=C(Object.keys(a)),k=f.next();!k.done;g={K:g.K,L:g.L},k=f.next()){var h=k.value;h in this.j&&this.j[h]===a[h]||(this.j[h]=a[h],k=b[h],void 0!==k&&(k.onChange&&(g.K=k.onChange,g.L=a[h],d.push(function(l){return function(){var n;return H(function(r){if(1==r.g)return F(r,l.K(l.L),2);n=r.h;!0===n&&(c.o=!0);r.g=0;})}}(g))),k.graphOptionXref&&(h={valueNumber:1===k.type?a[h]:0,valueBoolean:0===k.type?a[h]:!1,valueString:2===
-k.type?a[h]:""},k=Object.assign(Object.assign(Object.assign({},{calculatorName:"",calculatorIndex:0}),k.graphOptionXref),h),e.push(k))));}if(0!==d.length||0!==e.length)this.o=!0,this.A=(void 0===this.A?[]:this.A).concat(e),this.v=(void 0===this.v?[]:this.v).concat(d);}};
-function nc(a){var b,c,d,e,g,f,k;return H(function(h){switch(h.g){case 1:if(!a.o)return h.return();if(!a.v){h.g=2;break}b=C(a.v);c=b.next();case 3:if(c.done){h.g=5;break}d=c.value;return F(h,d(),4);case 4:c=b.next();h.g=3;break;case 5:a.v=void 0;case 2:if(a.A){e=new a.h.GraphOptionChangeRequestList;g=C(a.A);for(f=g.next();!f.done;f=g.next())k=f.value,e.push_back(k);a.i.changeOptions(e);e.delete();a.A=void 0;}a.o=!1;h.g=0;}})}
-x.initialize=function(){var a=this;return H(function(b){return 1==b.g?F(b,jc(a),2):3!=b.g?F(b,lc(a),3):F(b,nc(a),0)})};function kc(a,b){var c,d;return H(function(e){if(b in a.F)return e.return(a.F[b]);c=a.locateFile(b,"");d=fetch(c).then(function(g){return g.arrayBuffer()});a.F[b]=d;return e.return(d)})}x.overrideFile=function(a,b){this.i?this.i.overrideFile(a,b):this.B[a]=b;};x.clearOverriddenFiles=function(){this.B={};this.i&&this.i.clearOverriddenFiles();};
-x.send=function(a,b){var c=this,d,e,g,f,k,h,l,n,r;return H(function(p){switch(p.g){case 1:if(!c.g.inputs)return p.return();d=1E3*(void 0===b||null===b?performance.now():b);return F(p,c.C,2);case 2:return F(p,c.initialize(),3);case 3:e=new c.h.PacketDataList;g=C(Object.keys(a));for(f=g.next();!f.done;f=g.next())if(k=f.value,h=c.g.inputs[k]){a:{var m=a[k];switch(h.type){case "video":var q=c.m[h.stream];q||(q=new $b(c.h,c.D),c.m[h.stream]=q);0===q.l&&(q.l=q.h.createTexture());if("undefined"!==typeof HTMLVideoElement&&
-m instanceof HTMLVideoElement){var t=m.videoWidth;var w=m.videoHeight;}else "undefined"!==typeof HTMLImageElement&&m instanceof HTMLImageElement?(t=m.naturalWidth,w=m.naturalHeight):(t=m.width,w=m.height);w={glName:q.l,width:t,height:w};t=q.g;t.canvas.width=w.width;t.canvas.height=w.height;t.activeTexture(t.TEXTURE0);q.h.bindTexture2d(q.l);t.texImage2D(t.TEXTURE_2D,0,t.RGBA,t.RGBA,t.UNSIGNED_BYTE,m);q.h.bindTexture2d(0);q=w;break a;case "detections":q=c.m[h.stream];q||(q=new cc(c.h),c.m[h.stream]=q);
-q.data||(q.data=new q.g.DetectionListData);q.data.reset(m.length);for(w=0;w<m.length;++w){t=m[w];var v=q.data,A=v.setBoundingBox,I=w;var D=t.T;var u=new Sb;V(u,1,D.X);V(u,2,D.Y);V(u,3,D.height);V(u,4,D.width);V(u,5,D.rotation);V(u,6,D.W);D=wb(u,Ub);A.call(v,I,D);if(t.O)for(v=0;v<t.O.length;++v){u=t.O[v];var z=u.visibility?!0:!1;A=q.data;I=A.addNormalizedLandmark;D=w;u=Object.assign(Object.assign({},u),{visibility:z?u.visibility:0});z=new Kb;V(z,1,u.x);V(z,2,u.y);V(z,3,u.z);u.visibility&&V(z,4,u.visibility);
-u=wb(z,Mb);I.call(A,D,u);}if(t.M)for(v=0;v<t.M.length;++v)A=q.data,I=A.addClassification,D=w,u=t.M[v],z=new Cb,V(z,2,u.score),u.index&&V(z,1,u.index),u.label&&V(z,3,u.label),u.displayName&&V(z,4,u.displayName),u=wb(z,Eb),I.call(A,D,u);}q=q.data;break a;default:q={};}}l=q;n=h.stream;switch(h.type){case "video":e.pushTexture2d(Object.assign(Object.assign({},l),{stream:n,timestamp:d}));break;case "detections":r=l;r.stream=n;r.timestamp=d;e.pushDetectionList(r);break;default:throw Error("Unknown input config type: '"+
-h.type+"'");}}c.i.send(e);return F(p,c.C,4);case 4:e.delete(),p.g=0;}})};
-function oc(a,b,c){var d,e,g,f,k,h,l,n,r,p,m,q,t,w;return H(function(v){switch(v.g){case 1:if(!c)return v.return(b);d={};e=0;g=C(Object.keys(c));for(f=g.next();!f.done;f=g.next())k=f.value,h=c[k],"string"!==typeof h&&"texture"===h.type&&void 0!==b[h.stream]&&++e;1<e&&(a.G=!1);l=C(Object.keys(c));f=l.next();case 2:if(f.done){v.g=4;break}n=f.value;r=c[n];if("string"===typeof r)return t=d,w=n,F(v,pc(a,n,b[r]),14);p=b[r.stream];if("detection_list"===r.type){if(p){var A=p.getRectList();for(var I=p.getLandmarksList(),
-D=p.getClassificationsList(),u=[],z=0;z<A.size();++z){var R=xb(A.get(z),Sb,Vb);R={T:{X:W(R,1),Y:W(R,2),height:W(R,3),width:W(R,4),rotation:W(R,5,0),W:rb(R,6)},O:pb(xb(I.get(z),Ob,Rb),Kb,1).map(Yb),M:Xb(xb(D.get(z),Gb,Jb))};u.push(R);}A=u;}else A=[];d[n]=A;v.g=7;break}if("proto_list"===r.type){if(p){A=Array(p.size());for(I=0;I<p.size();I++)A[I]=p.get(I);p.delete();}else A=[];d[n]=A;v.g=7;break}if(void 0===p){v.g=3;break}if("float_list"===r.type){d[n]=p;v.g=7;break}if("proto"===r.type){d[n]=p;v.g=7;break}if("texture"!==
-r.type)throw Error("Unknown output config type: '"+r.type+"'");m=a.s[n];m||(m=new $b(a.h,a.D),a.s[n]=m);return F(v,ac(m,p,a.G),13);case 13:q=v.h,d[n]=q;case 7:r.transform&&d[n]&&(d[n]=r.transform(d[n]));v.g=3;break;case 14:t[w]=v.h;case 3:f=l.next();v.g=2;break;case 4:return v.return(d)}})}
-function pc(a,b,c){var d;return H(function(e){return "number"===typeof c||c instanceof Uint8Array||c instanceof a.h.Uint8BlobList?e.return(c):c instanceof a.h.Texture2dDataOut?(d=a.s[b],d||(d=new $b(a.h,a.D),a.s[b]=d),e.return(ac(d,c,a.G))):e.return(void 0)})}
-function mc(a,b){for(var c=b.name||"$",d=[].concat(ea(b.wants)),e=new a.h.StringList,g=C(b.wants),f=g.next();!f.done;f=g.next())e.push_back(f.value);g=a.h.PacketListener.implement({onResults:function(k){for(var h={},l=0;l<b.wants.length;++l)h[d[l]]=k.get(l);var n=a.listeners[c];n&&(a.C=oc(a,h,b.outs).then(function(r){r=n(r);for(var p=0;p<b.wants.length;++p){var m=h[d[p]];"object"===typeof m&&m.hasOwnProperty&&m.hasOwnProperty("delete")&&m.delete();}r&&(a.C=r);}));}});a.i.attachMultiListener(e,g);e.delete();}
-x.onResults=function(a,b){this.listeners[b||"$"]=a;};J("Solution",ic);J("OptionType",{BOOL:0,NUMBER:1,Z:2,0:"BOOL",1:"NUMBER",2:"STRING"});function qc(a){void 0===a&&(a=0);return 1===a?"hand_landmark_full.tflite":"hand_landmark_lite.tflite"}
-function rc(a){var b=this;a=a||{};this.g=new ic({locateFile:a.locateFile,files:function(c){return [{url:"hands_solution_packed_assets_loader.js"},{simd:!1,url:"hands_solution_wasm_bin.js"},{simd:!0,url:"hands_solution_simd_wasm_bin.js"},{data:!0,url:qc(c.modelComplexity)}]},graph:{url:"hands.binarypb"},inputs:{image:{type:"video",stream:"input_frames_gpu"}},listeners:[{wants:["multi_hand_landmarks","multi_hand_world_landmarks","image_transformed","multi_handedness"],outs:{image:"image_transformed",
-multiHandLandmarks:{type:"proto_list",stream:"multi_hand_landmarks",transform:Zb},multiHandWorldLandmarks:{type:"proto_list",stream:"multi_hand_world_landmarks",transform:Zb},multiHandedness:{type:"proto_list",stream:"multi_handedness",transform:function(c){return c.map(function(d){return Xb(xb(d,Gb,Jb))[0]})}}}}],options:{useCpuInference:{type:0,graphOptionXref:{calculatorType:"InferenceCalculator",fieldName:"use_cpu_inference"},default:"iPad Simulator;iPhone Simulator;iPod Simulator;iPad;iPhone;iPod".split(";").includes(navigator.platform)||
+function J(a,b){a=a.split(".");var c=wa;a[0]in c||"undefined"==typeof c.execScript||c.execScript("var "+a[0]);for(var d;a.length&&(d=a.shift());)a.length||void 0===b?c[d]&&c[d]!==Object.prototype[d]?c=c[d]:c=c[d]={}:c[d]=b;}function K(){throw Error("Invalid UTF8");}function xa(a,b){b=String.fromCharCode.apply(null,b);return null==a?b:a+b}var ya,za="undefined"!==typeof TextDecoder,Aa,Ba="undefined"!==typeof TextEncoder;var Ca={},L=null;function Da(a){var b;void 0===b&&(b=0);Ea();b=Ca[b];for(var c=Array(Math.floor(a.length/3)),d=b[64]||"",e=0,g=0;e<a.length-2;e+=3){var f=a[e],h=a[e+1],k=a[e+2],l=b[f>>2];f=b[(f&3)<<4|h>>4];h=b[(h&15)<<2|k>>6];k=b[k&63];c[g++]=l+f+h+k;}l=0;k=d;switch(a.length-e){case 2:l=a[e+1],k=b[(l&15)<<2]||d;case 1:a=a[e],c[g]=b[a>>2]+b[(a&3)<<4|l>>4]+k+d;}return c.join("")}
+function Fa(a){var b=a.length,c=3*b/4;c%3?c=Math.floor(c):-1!="=.".indexOf(a[b-1])&&(c=-1!="=.".indexOf(a[b-2])?c-2:c-1);var d=new Uint8Array(c),e=0;Ga(a,function(g){d[e++]=g;});return e!==c?d.subarray(0,e):d}
+function Ga(a,b){function c(k){for(;d<a.length;){var l=a.charAt(d++),m=L[l];if(null!=m)return m;if(!/^[\s\xa0]*$/.test(l))throw Error("Unknown base64 encoding at char: "+l);}return k}Ea();for(var d=0;;){var e=c(-1),g=c(0),f=c(64),h=c(64);if(64===h&&-1===e)break;b(e<<2|g>>4);64!=f&&(b(g<<4&240|f>>2),64!=h&&b(f<<6&192|h));}}
+function Ea(){if(!L){L={};for(var a="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".split(""),b=["+/=","+/","-_=","-_.","-_"],c=0;5>c;c++){var d=a.concat(b[c].split(""));Ca[c]=d;for(var e=0;e<d.length;e++){var g=d[e];void 0===L[g]&&(L[g]=e);}}}}var Ha="function"===typeof Uint8Array;function Ia(a){return Ha&&null!=a&&a instanceof Uint8Array}var Ja;function Ka(a){this.L=a;if(null!==a&&0===a.length)throw Error("ByteString should be constructed with non-empty values");}var La="function"===typeof Uint8Array.prototype.slice,M=0,N=0;
+function Ma(a,b){if(a.constructor===Uint8Array)return a;if(a.constructor===ArrayBuffer)return new Uint8Array(a);if(a.constructor===Array)return new Uint8Array(a);if(a.constructor===String)return Fa(a);if(a.constructor===Ka){if(!b&&(b=a.L)&&b.constructor===Uint8Array)return b;b=a.L;b=null==b||Ia(b)?b:"string"===typeof b?Fa(b):null;return (a=a.L=b)?new Uint8Array(a):Ja||(Ja=new Uint8Array(0))}if(a instanceof Uint8Array)return new Uint8Array(a.buffer,a.byteOffset,a.byteLength);throw Error("Type not convertible to a Uint8Array, expected a Uint8Array, an ArrayBuffer, a base64 encoded string, or Array of numbers");
+}function Na(a,b){return Error("Invalid wire type: "+a+" (at position "+b+")")}function Oa(){return Error("Failed to read varint, encoding is invalid.")}function Pa(a,b){b=void 0===b?{}:b;b=void 0===b.v?!1:b.v;this.h=null;this.g=this.i=this.j=0;this.v=b;a&&Qa(this,a);}function Qa(a,b){a.h=Ma(b,a.v);a.j=0;a.i=a.h.length;a.g=a.j;}Pa.prototype.reset=function(){this.g=this.j;};function O(a){if(a.g>a.i)throw Error("Tried to read past the end of the data "+a.g+" > "+a.i);}
+function Q(a){var b=a.h,c=b[a.g],d=c&127;if(128>c)return a.g+=1,O(a),d;c=b[a.g+1];d|=(c&127)<<7;if(128>c)return a.g+=2,O(a),d;c=b[a.g+2];d|=(c&127)<<14;if(128>c)return a.g+=3,O(a),d;c=b[a.g+3];d|=(c&127)<<21;if(128>c)return a.g+=4,O(a),d;c=b[a.g+4];a.g+=5;d|=(c&15)<<28;if(128>c)return O(a),d;if(128<=b[a.g++]&&128<=b[a.g++]&&128<=b[a.g++]&&128<=b[a.g++]&&128<=b[a.g++])throw Oa();O(a);return d}var Ra=[];function Sa(){this.g=[];}Sa.prototype.length=function(){return this.g.length};Sa.prototype.end=function(){var a=this.g;this.g=[];return a};function R(a,b){for(;127<b;)a.g.push(b&127|128),b>>>=7;a.g.push(b);}function Ta(a){var b={},c=void 0===b.W?!1:b.W;this.l={v:void 0===b.v?!1:b.v};this.W=c;b=this.l;Ra.length?(c=Ra.pop(),b&&(c.v=b.v),a&&Qa(c,a),a=c):a=new Pa(a,b);this.g=a;this.j=this.g.g;this.h=this.i=-1;}Ta.prototype.reset=function(){this.g.reset();this.j=this.g.g;this.h=this.i=-1;};function Ua(a){var b=a.g;if(b.g==b.i)return !1;a.j=a.g.g;var c=Q(a.g)>>>0;b=c>>>3;c&=7;if(!(0<=c&&5>=c))throw Na(c,a.j);if(1>b)throw Error("Invalid field number: "+b+" (at position "+a.j+")");a.i=b;a.h=c;return !0}
+function Va(a){switch(a.h){case 0:if(0!=a.h)Va(a);else a:{a=a.g;for(var b=a.g,c=b+10;b<c;)if(0===(a.h[b++]&128)){a.g=b;O(a);break a}throw Oa();}break;case 1:a=a.g;a.g+=8;O(a);break;case 2:2!=a.h?Va(a):(b=Q(a.g)>>>0,a=a.g,a.g+=b,O(a));break;case 5:a=a.g;a.g+=4;O(a);break;case 3:b=a.i;do{if(!Ua(a))throw Error("Unmatched start-group tag: stream EOF");if(4==a.h){if(a.i!=b)throw Error("Unmatched end-group tag");break}Va(a);}while(1);break;default:throw Na(a.h,a.j);}}var Wa=[];function Xa(){this.i=[];this.h=0;this.g=new Sa;}function S(a,b){0!==b.length&&(a.i.push(b),a.h+=b.length);}function Ya(a,b){if(b=b.ca){S(a,a.g.end());for(var c=0;c<b.length;c++)S(a,b[c]);}}var T="function"===typeof Symbol&&"symbol"===typeof Symbol()?Symbol(void 0):void 0;function Za(a,b){Object.isFrozen(a)||(T?a[T]|=b:void 0!==a.N?a.N|=b:Object.defineProperties(a,{N:{value:b,configurable:!0,writable:!0,enumerable:!1}}));}function $a(a){var b;T?b=a[T]:b=a.N;return null==b?0:b}function U(a){Za(a,1);return a}function ab(a){return Array.isArray(a)?!!($a(a)&2):!1}function bb(a){if(!Array.isArray(a))throw Error("cannot mark non-array as immutable");Za(a,2);}function cb(a){return null!==a&&"object"===typeof a&&!Array.isArray(a)&&a.constructor===Object}var db=Object.freeze(U([]));function eb(a){if(ab(a.m))throw Error("Cannot mutate an immutable Message");}var fb="undefined"!=typeof Symbol&&"undefined"!=typeof Symbol.hasInstance;function gb(a){return {value:a,configurable:!1,writable:!1,enumerable:!1}}function V(a,b,c){return -1===b?null:b>=a.i?a.g?a.g[b]:void 0:(void 0===c?0:c)&&a.g&&(c=a.g[b],null!=c)?c:a.m[b+a.h]}function W(a,b,c,d){d=void 0===d?!1:d;eb(a);b<a.i&&!d?a.m[b+a.h]=c:(a.g||(a.g=a.m[a.i+a.h]={}))[b]=c;}function hb(a,b,c,d){c=void 0===c?!0:c;d=void 0===d?!1:d;var e=V(a,b,d);null==e&&(e=db);if(ab(a.m))c&&(bb(e),Object.freeze(e));else if(e===db||ab(e))e=U(e.slice()),W(a,b,e,d);return e}function X(a,b,c){a=V(a,b);a=null==a?a:+a;return null==a?void 0===c?0:c:a}
+function ib(a,b,c,d){a.j||(a.j={});var e=ab(a.m),g=a.j[c];if(!g){d=hb(a,c,!0,void 0===d?!1:d);g=[];e=e||ab(d);for(var f=0;f<d.length;f++)g[f]=new b(d[f]),e&&bb(g[f].m);e&&(bb(g),Object.freeze(g));a.j[c]=g;}return g}function jb(a,b,c,d,e){var g=void 0===g?!1:g;eb(a);g=ib(a,c,b,g);c=d?d:new c;a=hb(a,b);void 0!=e?(g.splice(e,0,c),a.splice(e,0,c.m)):(g.push(c),a.push(c.m));return c}function kb(a,b){a=V(a,b);return null==a?0:a}function lb(a,b){a=V(a,b);return null==a?"":a}function mb(a){switch(typeof a){case "number":return isFinite(a)?a:String(a);case "object":if(a&&!Array.isArray(a)){if(Ia(a))return Da(a);if(a instanceof Ka){var b=a.L;b=null==b||"string"===typeof b?b:Ha&&b instanceof Uint8Array?Da(b):null;return (a.L=b)||""}}}return a}function nb(a){var b=ob;b=void 0===b?pb:b;return qb(a,b)}function rb(a,b){if(null!=a){if(Array.isArray(a))a=qb(a,b);else if(cb(a)){var c={},d;for(d in a)c[d]=rb(a[d],b);a=c;}else a=b(a);return a}}function qb(a,b){for(var c=a.slice(),d=0;d<c.length;d++)c[d]=rb(c[d],b);Array.isArray(a)&&$a(a)&1&&U(c);return c}function ob(a){if(a&&"object"==typeof a&&a.toJSON)return a.toJSON();a=mb(a);return Array.isArray(a)?nb(a):a}function pb(a){return Ia(a)?new Uint8Array(a):a}function sb(a,b,c){a||(a=tb);tb=null;var d=this.constructor.h;a||(a=d?[d]:[]);this.h=(d?0:-1)-(this.constructor.g||0);this.j=void 0;this.m=a;a:{d=this.m.length;a=d-1;if(d&&(d=this.m[a],cb(d))){this.i=a-this.h;this.g=d;break a}void 0!==b&&-1<b?(this.i=Math.max(b,a+1-this.h),this.g=void 0):this.i=Number.MAX_VALUE;}if(c)for(b=0;b<c.length;b++)if(a=c[b],a<this.i)a+=this.h,(d=this.m[a])?Array.isArray(d)&&U(d):this.m[a]=db;else {d=this.g||(this.g=this.m[this.i+this.h]={});var e=d[a];e?Array.isArray(e)&&U(e):
+d[a]=db;}}sb.prototype.toJSON=function(){return nb(this.m)};sb.prototype.toString=function(){return this.m.toString()};var tb;function ub(){sb.apply(this,arguments);}D(ub,sb);if(fb){var vb={};Object.defineProperties(ub,(vb[Symbol.hasInstance]=gb(function(){throw Error("Cannot perform instanceof checks for MutableMessage");}),vb));}function wb(a,b,c){if(c){var d={},e;for(e in c){var g=c[e],f=g.ja;f||(d.F=g.pa||g.ha.P,g.ba?(d.U=xb(g.ba),f=function(h){return function(k,l,m){return h.F(k,l,m,h.U)}}(d)):g.da?(d.T=yb(g.X.g,g.da),f=function(h){return function(k,l,m){return h.F(k,l,m,h.T)}}(d)):f=d.F,g.ja=f);f(b,a,g.X);d={F:d.F,U:d.U,T:d.T};}}Ya(b,a);}var zb=Symbol();function Ab(a,b,c){return a[zb]||(a[zb]=function(d,e){return b(d,e,c)})}
+function Bb(a){var b=a[zb];if(!b){var c=Cb(a);b=function(d,e){return Db(d,e,c)};a[zb]=b;}return b}function Eb(a){var b=a.ba;if(b)return Bb(b);if(b=a.oa)return Ab(a.X.g,b,a.da)}function Fb(a){var b=Eb(a),c=a.X,d=a.ha.O;return b?function(e,g){return d(e,g,c,b)}:function(e,g){return d(e,g,c)}}
+function Gb(a,b,c,d,e,g){a=a();var f=0;a.length&&"number"!==typeof a[0]&&(c(b,a[0]),f++);for(;f<a.length;){c=a[f++];for(var h=f+1;h<a.length&&"number"!==typeof a[h];)h++;var k=a[f++];h-=f;switch(h){case 0:d(b,c,k);break;case 1:d(b,c,k,a[f++]);break;case 2:e(b,c,k,a[f++],a[f++]);break;case 3:h=a[f++];var l=a[f++],m=a[f++];Array.isArray(m)?e(b,c,k,h,l,m):g(b,c,k,h,l,m);break;case 4:g(b,c,k,a[f++],a[f++],a[f++],a[f++]);break;default:throw Error("unexpected number of binary field arguments: "+h);}}return b}
+var Hb=Symbol();function xb(a){var b=a[Hb];if(!b){var c=Ib(a);b=function(d,e){return Jb(d,e,c)};a[Hb]=b;}return b}function yb(a,b){var c=a[Hb];c||(c=function(d,e){return wb(d,e,b)},a[Hb]=c);return c}var Kb=Symbol();function Lb(a,b){a.push(b);}function Mb(a,b,c){a.push(b,c.P);}function Nb(a,b,c,d,e){var g=xb(e),f=c.P;a.push(b,function(h,k,l){return f(h,k,l,d,g)});}function Ob(a,b,c,d,e,g){var f=yb(d,g),h=c.P;a.push(b,function(k,l,m){return h(k,l,m,d,f)});}
+function Ib(a){var b=a[Kb];return b?b:Gb(a,a[Kb]=[],Lb,Mb,Nb,Ob)}var Pb=Symbol();function Qb(a,b){a[0]=b;}function Rb(a,b,c,d){var e=c.O;a[b]=d?function(g,f,h){return e(g,f,h,d)}:e;}function Sb(a,b,c,d,e,g){var f=c.O,h=Bb(e);a[b]=function(k,l,m){return f(k,l,m,d,h,g)};}function Tb(a,b,c,d,e,g,f){var h=c.O,k=Ab(d,e,g);a[b]=function(l,m,r){return h(l,m,r,d,k,f)};}function Cb(a){var b=a[Pb];return b?b:Gb(a,a[Pb]={},Qb,Rb,Sb,Tb)}
+function Db(a,b,c){for(;Ua(b)&&4!=b.h;){var d=b.i,e=c[d];if(!e){var g=c[0];g&&(g=g[d])&&(e=c[d]=Fb(g));}if(!e||!e(b,a,d))if(e=b,d=a,g=e.j,Va(e),!e.W){var f=e.g.h;e=e.g.g;e=g===e?Ja||(Ja=new Uint8Array(0)):La?f.slice(g,e):new Uint8Array(f.subarray(g,e));(g=d.ca)?g.push(e):d.ca=[e];}}return a}
+function Ub(a,b,c){if(Wa.length){var d=Wa.pop();a&&(Qa(d.g,a),d.i=-1,d.h=-1);a=d;}else a=new Ta(a);try{return Db(new b,a,Cb(c))}finally{b=a.g,b.h=null,b.j=0,b.i=0,b.g=0,b.v=!1,a.i=-1,a.h=-1,100>Wa.length&&Wa.push(a);}}function Jb(a,b,c){for(var d=c.length,e=1==d%2,g=e?1:0;g<d;g+=2)(0, c[g+1])(b,a,c[g]);wb(a,b,e?c[0]:void 0);}function Vb(a,b){var c=new Xa;Jb(a,c,Ib(b));S(c,c.g.end());a=new Uint8Array(c.h);b=c.i;for(var d=b.length,e=0,g=0;g<d;g++){var f=b[g];a.set(f,e);e+=f.length;}c.i=[a];return a}
+function Wb(a,b){return {O:a,P:b}}
+var Y=Wb(function(a,b,c){if(5!==a.h)return !1;a=a.g;var d=a.h[a.g];var e=a.h[a.g+1];var g=a.h[a.g+2],f=a.h[a.g+3];a.g+=4;O(a);e=(d<<0|e<<8|g<<16|f<<24)>>>0;a=2*(e>>31)+1;d=e>>>23&255;e&=8388607;W(b,c,255==d?e?NaN:Infinity*a:0==d?a*Math.pow(2,-149)*e:a*Math.pow(2,d-150)*(e+Math.pow(2,23)));return !0},function(a,b,c){b=V(b,c);if(null!=b){R(a.g,8*c+5);a=a.g;var d=b;d=(c=0>d?1:0)?-d:d;0===d?0<1/d?M=N=0:(N=0,M=2147483648):isNaN(d)?(N=0,M=2147483647):3.4028234663852886E38<d?(N=0,M=(c<<31|2139095040)>>>0):
+1.1754943508222875E-38>d?(d=Math.round(d/Math.pow(2,-149)),N=0,M=(c<<31|d)>>>0):(b=Math.floor(Math.log(d)/Math.LN2),d*=Math.pow(2,-b),d=Math.round(8388608*d),16777216<=d&&++b,N=0,M=(c<<31|b+127<<23|d&8388607)>>>0);c=M;a.g.push(c>>>0&255);a.g.push(c>>>8&255);a.g.push(c>>>16&255);a.g.push(c>>>24&255);}}),Xb=Wb(function(a,b,c){if(0!==a.h)return !1;for(var d=a.g,e=128,g=0,f=a=0;4>f&&128<=e;f++)e=d.h[d.g++],O(d),g|=(e&127)<<7*f;128<=e&&(e=d.h[d.g++],O(d),g|=(e&127)<<28,a|=(e&127)>>4);if(128<=e)for(f=0;5>
+f&&128<=e;f++)e=d.h[d.g++],O(d),a|=(e&127)<<7*f+3;if(128>e){d=g>>>0;e=a>>>0;if(a=e&2147483648)d=~d+1>>>0,e=~e>>>0,0==d&&(e=e+1>>>0);d=4294967296*e+(d>>>0);}else throw Oa();W(b,c,a?-d:d);return !0},function(a,b,c){b=V(b,c);if(null!=b&&null!=b){R(a.g,8*c);a=a.g;var d=b;c=0>d;d=Math.abs(d);b=d>>>0;d=Math.floor((d-b)/4294967296);d>>>=0;c&&(d=~d>>>0,b=(~b>>>0)+1,4294967295<b&&(b=0,d++,4294967295<d&&(d=0)));M=b;N=d;c=M;for(b=N;0<b||127<c;)a.g.push(c&127|128),c=(c>>>7|b<<25)>>>0,b>>>=7;a.g.push(c);}}),Yb=Wb(function(a,
+b,c){if(0!==a.h)return !1;W(b,c,Q(a.g));return !0},function(a,b,c){b=V(b,c);if(null!=b&&null!=b)if(R(a.g,8*c),a=a.g,c=b,0<=c)R(a,c);else {for(b=0;9>b;b++)a.g.push(c&127|128),c>>=7;a.g.push(1);}}),Zb=Wb(function(a,b,c){if(2!==a.h)return !1;var d=Q(a.g)>>>0;a=a.g;var e=a.g;a.g+=d;O(a);a=a.h;var g;if(za)(g=ya)||(g=ya=new TextDecoder("utf-8",{fatal:!0})),g=g.decode(a.subarray(e,e+d));else {d=e+d;for(var f=[],h=null,k,l,m;e<d;)k=a[e++],128>k?f.push(k):224>k?e>=d?K():(l=a[e++],194>k||128!==(l&192)?(e--,K()):
+f.push((k&31)<<6|l&63)):240>k?e>=d-1?K():(l=a[e++],128!==(l&192)||224===k&&160>l||237===k&&160<=l||128!==((g=a[e++])&192)?(e--,K()):f.push((k&15)<<12|(l&63)<<6|g&63)):244>=k?e>=d-2?K():(l=a[e++],128!==(l&192)||0!==(k<<28)+(l-144)>>30||128!==((g=a[e++])&192)||128!==((m=a[e++])&192)?(e--,K()):(k=(k&7)<<18|(l&63)<<12|(g&63)<<6|m&63,k-=65536,f.push((k>>10&1023)+55296,(k&1023)+56320))):K(),8192<=f.length&&(h=xa(h,f),f.length=0);g=xa(h,f);}W(b,c,g);return !0},function(a,b,c){b=V(b,c);if(null!=b){var d=!1;
+d=void 0===d?!1:d;if(Ba){if(d&&/(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])/.test(b))throw Error("Found an unpaired surrogate");b=(Aa||(Aa=new TextEncoder)).encode(b);}else {for(var e=0,g=new Uint8Array(3*b.length),f=0;f<b.length;f++){var h=b.charCodeAt(f);if(128>h)g[e++]=h;else {if(2048>h)g[e++]=h>>6|192;else {if(55296<=h&&57343>=h){if(56319>=h&&f<b.length){var k=b.charCodeAt(++f);if(56320<=k&&57343>=k){h=1024*(h-55296)+k-56320+65536;g[e++]=h>>18|240;g[e++]=h>>12&63|128;
+g[e++]=h>>6&63|128;g[e++]=h&63|128;continue}else f--;}if(d)throw Error("Found an unpaired surrogate");h=65533;}g[e++]=h>>12|224;g[e++]=h>>6&63|128;}g[e++]=h&63|128;}}b=g.subarray(0,e);}R(a.g,8*c+2);R(a.g,b.length);S(a,a.g.end());S(a,b);}}),$b=Wb(function(a,b,c,d,e){if(2!==a.h)return !1;b=jb(b,c,d);c=a.g.i;d=Q(a.g)>>>0;var g=a.g.g+d,f=g-c;0>=f&&(a.g.i=g,e(b,a),f=g-a.g.g);if(f)throw Error("Message parsing ended unexpectedly. Expected to read "+(d+" bytes, instead read "+(d-f)+" bytes, either the data ended unexpectedly or the message misreported its own length"));
+a.g.g=g;a.g.i=c;return !0},function(a,b,c,d,e){b=ib(b,d,c);if(null!=b)for(d=0;d<b.length;d++){var g=a;R(g.g,8*c+2);var f=g.g.end();S(g,f);f.push(g.h);g=f;e(b[d],a);f=a;var h=g.pop();for(h=f.h+f.g.length()-h;127<h;)g.push(h&127|128),h>>>=7,f.h++;g.push(h);f.h++;}});function Z(){ub.apply(this,arguments);}D(Z,ub);if(fb){var ac={};Object.defineProperties(Z,(ac[Symbol.hasInstance]=gb(Object[Symbol.hasInstance]),ac));}function bc(a){Z.call(this,a);}D(bc,Z);function cc(){return [1,Yb,2,Y,3,Zb,4,Zb]}function dc(a){Z.call(this,a,-1,ec);}D(dc,Z);dc.prototype.addClassification=function(a,b){jb(this,1,bc,a,b);return this};function fc(){return [1,$b,bc,cc]}var ec=[1];function gc(a){Z.call(this,a);}D(gc,Z);function hc(){return [1,Y,2,Y,3,Y,4,Y,5,Y]}function ic(a){Z.call(this,a,-1,jc);}D(ic,Z);function kc(){return [1,$b,gc,hc]}var jc=[1];function lc(a){Z.call(this,a);}D(lc,Z);function mc(){return [1,Y,2,Y,3,Y,4,Y,5,Y,6,Xb]}function nc(a,b,c){c=a.createShader(0===c?a.VERTEX_SHADER:a.FRAGMENT_SHADER);a.shaderSource(c,b);a.compileShader(c);if(!a.getShaderParameter(c,a.COMPILE_STATUS))throw Error("Could not compile WebGL shader.\n\n"+a.getShaderInfoLog(c));return c}function oc(a){return ib(a,bc,1).map(function(b){return {index:kb(b,1),score:X(b,2),label:null!=V(b,3)?lb(b,3):void 0,displayName:null!=V(b,4)?lb(b,4):void 0}})}function pc(a){return {x:X(a,1),y:X(a,2),z:X(a,3),visibility:null!=V(a,4)?X(a,4):void 0}}function qc(a){return a.map(function(b){return ib(Ub(b,ic,kc),gc,1).map(pc)})}function rc(a,b){this.h=a;this.g=b;this.l=0;}
+function sc(a,b,c){tc(a,b);if("function"===typeof a.g.canvas.transferToImageBitmap)return Promise.resolve(a.g.canvas.transferToImageBitmap());if(c)return Promise.resolve(a.g.canvas);if("function"===typeof createImageBitmap)return createImageBitmap(a.g.canvas);void 0===a.i&&(a.i=document.createElement("canvas"));return new Promise(function(d){a.i.height=a.g.canvas.height;a.i.width=a.g.canvas.width;a.i.getContext("2d",{}).drawImage(a.g.canvas,0,0,a.g.canvas.width,a.g.canvas.height);d(a.i);})}
+function tc(a,b){var c=a.g;if(void 0===a.o){var d=nc(c,"\n  attribute vec2 aVertex;\n  attribute vec2 aTex;\n  varying vec2 vTex;\n  void main(void) {\n    gl_Position = vec4(aVertex, 0.0, 1.0);\n    vTex = aTex;\n  }",0),e=nc(c,"\n  precision mediump float;\n  varying vec2 vTex;\n  uniform sampler2D sampler0;\n  void main(){\n    gl_FragColor = texture2D(sampler0, vTex);\n  }",1),g=c.createProgram();c.attachShader(g,d);c.attachShader(g,e);c.linkProgram(g);if(!c.getProgramParameter(g,c.LINK_STATUS))throw Error("Could not compile WebGL program.\n\n"+
+c.getProgramInfoLog(g));d=a.o=g;c.useProgram(d);e=c.getUniformLocation(d,"sampler0");a.j={K:c.getAttribLocation(d,"aVertex"),J:c.getAttribLocation(d,"aTex"),qa:e};a.u=c.createBuffer();c.bindBuffer(c.ARRAY_BUFFER,a.u);c.enableVertexAttribArray(a.j.K);c.vertexAttribPointer(a.j.K,2,c.FLOAT,!1,0,0);c.bufferData(c.ARRAY_BUFFER,new Float32Array([-1,-1,-1,1,1,1,1,-1]),c.STATIC_DRAW);c.bindBuffer(c.ARRAY_BUFFER,null);a.s=c.createBuffer();c.bindBuffer(c.ARRAY_BUFFER,a.s);c.enableVertexAttribArray(a.j.J);c.vertexAttribPointer(a.j.J,
+2,c.FLOAT,!1,0,0);c.bufferData(c.ARRAY_BUFFER,new Float32Array([0,1,0,0,1,0,1,1]),c.STATIC_DRAW);c.bindBuffer(c.ARRAY_BUFFER,null);c.uniform1i(e,0);}d=a.j;c.useProgram(a.o);c.canvas.width=b.width;c.canvas.height=b.height;c.viewport(0,0,b.width,b.height);c.activeTexture(c.TEXTURE0);a.h.bindTexture2d(b.glName);c.enableVertexAttribArray(d.K);c.bindBuffer(c.ARRAY_BUFFER,a.u);c.vertexAttribPointer(d.K,2,c.FLOAT,!1,0,0);c.enableVertexAttribArray(d.J);c.bindBuffer(c.ARRAY_BUFFER,a.s);c.vertexAttribPointer(d.J,
+2,c.FLOAT,!1,0,0);c.bindFramebuffer(c.DRAW_FRAMEBUFFER?c.DRAW_FRAMEBUFFER:c.FRAMEBUFFER,null);c.clearColor(0,0,0,0);c.clear(c.COLOR_BUFFER_BIT);c.colorMask(!0,!0,!0,!0);c.drawArrays(c.TRIANGLE_FAN,0,4);c.disableVertexAttribArray(d.K);c.disableVertexAttribArray(d.J);c.bindBuffer(c.ARRAY_BUFFER,null);a.h.bindTexture2d(0);}function uc(a){this.g=a;}var vc=new Uint8Array([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,2,1,0,10,9,1,7,0,65,0,253,15,26,11]);function wc(a,b){return b+a}function xc(a,b){window[a]=b;}function yc(a){var b=document.createElement("script");b.setAttribute("src",a);b.setAttribute("crossorigin","anonymous");return new Promise(function(c){b.addEventListener("load",function(){c();},!1);b.addEventListener("error",function(){c();},!1);document.body.appendChild(b);})}
+function zc(){return I(function(a){switch(a.g){case 1:return a.o=2,F(a,WebAssembly.instantiate(vc),4);case 4:a.g=3;a.o=0;break;case 2:return a.o=0,a.j=null,a.return(!1);case 3:return a.return(!0)}})}
+function Ac(a){this.g=a;this.listeners={};this.j={};this.H={};this.o={};this.u={};this.I=this.s=this.$=!0;this.D=Promise.resolve();this.Z="";this.C={};this.locateFile=a&&a.locateFile||wc;if("object"===typeof window)var b=window.location.pathname.toString().substring(0,window.location.pathname.toString().lastIndexOf("/"))+"/";else if("undefined"!==typeof location)b=location.pathname.toString().substring(0,location.pathname.toString().lastIndexOf("/"))+"/";else throw Error("solutions can only be loaded on a web page or in a web worker");
+this.aa=b;if(a.options){b=C(Object.keys(a.options));for(var c=b.next();!c.done;c=b.next()){c=c.value;var d=a.options[c].default;void 0!==d&&(this.j[c]="function"===typeof d?d():d);}}}x=Ac.prototype;x.close=function(){this.i&&this.i.delete();return Promise.resolve()};
+function Bc(a){var b,c,d,e,g,f,h,k,l,m,r;return I(function(p){switch(p.g){case 1:if(!a.$)return p.return();b=void 0===a.g.files?[]:"function"===typeof a.g.files?a.g.files(a.j):a.g.files;return F(p,zc(),2);case 2:c=p.h;if("object"===typeof window)return xc("createMediapipeSolutionsWasm",{locateFile:a.locateFile}),xc("createMediapipeSolutionsPackedAssets",{locateFile:a.locateFile}),f=b.filter(function(n){return void 0!==n.data}),h=b.filter(function(n){return void 0===n.data}),k=Promise.all(f.map(function(n){var q=
+Cc(a,n.url);if(void 0!==n.path){var t=n.path;q=q.then(function(w){a.overrideFile(t,w);return Promise.resolve(w)});}return q})),l=Promise.all(h.map(function(n){return void 0===n.simd||n.simd&&c||!n.simd&&!c?yc(a.locateFile(n.url,a.aa)):Promise.resolve()})).then(function(){var n,q,t;return I(function(w){if(1==w.g)return n=window.createMediapipeSolutionsWasm,q=window.createMediapipeSolutionsPackedAssets,t=a,F(w,n(q),2);t.h=w.h;w.g=0;})}),m=function(){return I(function(n){a.g.graph&&a.g.graph.url?n=F(n,
+Cc(a,a.g.graph.url),0):(n.g=0,n=void 0);return n})}(),F(p,Promise.all([l,k,m]),7);if("function"!==typeof importScripts)throw Error("solutions can only be loaded on a web page or in a web worker");d=b.filter(function(n){return void 0===n.simd||n.simd&&c||!n.simd&&!c}).map(function(n){return a.locateFile(n.url,a.aa)});importScripts.apply(null,ea(d));e=a;return F(p,createMediapipeSolutionsWasm(Module),6);case 6:e.h=p.h;a.l=new OffscreenCanvas(1,1);a.h.canvas=a.l;g=a.h.GL.createContext(a.l,{antialias:!1,
+alpha:!1,na:"undefined"!==typeof WebGL2RenderingContext?2:1});a.h.GL.makeContextCurrent(g);p.g=4;break;case 7:a.l=document.createElement("canvas");r=a.l.getContext("webgl2",{});if(!r&&(r=a.l.getContext("webgl",{}),!r))return alert("Failed to create WebGL canvas context when passing video frame."),p.return();a.G=r;a.h.canvas=a.l;a.h.createContext(a.l,!0,!0,{});case 4:a.i=new a.h.SolutionWasm,a.$=!1,p.g=0;}})}
+function Dc(a){var b,c,d,e,g,f,h,k;return I(function(l){if(1==l.g){if(a.g.graph&&a.g.graph.url&&a.Z===a.g.graph.url)return l.return();a.s=!0;if(!a.g.graph||!a.g.graph.url){l.g=2;return}a.Z=a.g.graph.url;return F(l,Cc(a,a.g.graph.url),3)}2!=l.g&&(b=l.h,a.i.loadGraph(b));c=C(Object.keys(a.C));for(d=c.next();!d.done;d=c.next())e=d.value,a.i.overrideFile(e,a.C[e]);a.C={};if(a.g.listeners)for(g=C(a.g.listeners),f=g.next();!f.done;f=g.next())h=f.value,Ec(a,h);k=a.j;a.j={};a.setOptions(k);l.g=0;})}
+x.reset=function(){var a=this;return I(function(b){a.i&&(a.i.reset(),a.o={},a.u={});b.g=0;})};
+x.setOptions=function(a,b){var c=this;if(b=b||this.g.options){for(var d=[],e=[],g={},f=C(Object.keys(a)),h=f.next();!h.done;g={R:g.R,S:g.S},h=f.next()){var k=h.value;k in this.j&&this.j[k]===a[k]||(this.j[k]=a[k],h=b[k],void 0!==h&&(h.onChange&&(g.R=h.onChange,g.S=a[k],d.push(function(l){return function(){var m;return I(function(r){if(1==r.g)return F(r,l.R(l.S),2);m=r.h;!0===m&&(c.s=!0);r.g=0;})}}(g))),h.graphOptionXref&&(k={valueNumber:1===h.type?a[k]:0,valueBoolean:0===h.type?a[k]:!1,valueString:2===
+h.type?a[k]:""},h=Object.assign(Object.assign(Object.assign({},{calculatorName:"",calculatorIndex:0}),h.graphOptionXref),k),e.push(h))));}if(0!==d.length||0!==e.length)this.s=!0,this.B=(void 0===this.B?[]:this.B).concat(e),this.A=(void 0===this.A?[]:this.A).concat(d);}};
+function Fc(a){var b,c,d,e,g,f,h;return I(function(k){switch(k.g){case 1:if(!a.s)return k.return();if(!a.A){k.g=2;break}b=C(a.A);c=b.next();case 3:if(c.done){k.g=5;break}d=c.value;return F(k,d(),4);case 4:c=b.next();k.g=3;break;case 5:a.A=void 0;case 2:if(a.B){e=new a.h.GraphOptionChangeRequestList;g=C(a.B);for(f=g.next();!f.done;f=g.next())h=f.value,e.push_back(h);a.i.changeOptions(e);e.delete();a.B=void 0;}a.s=!1;k.g=0;}})}
+x.initialize=function(){var a=this;return I(function(b){return 1==b.g?F(b,Bc(a),2):3!=b.g?F(b,Dc(a),3):F(b,Fc(a),0)})};function Cc(a,b){var c,d;return I(function(e){if(b in a.H)return e.return(a.H[b]);c=a.locateFile(b,"");d=fetch(c).then(function(g){return g.arrayBuffer()});a.H[b]=d;return e.return(d)})}x.overrideFile=function(a,b){this.i?this.i.overrideFile(a,b):this.C[a]=b;};x.clearOverriddenFiles=function(){this.C={};this.i&&this.i.clearOverriddenFiles();};
+x.send=function(a,b){var c=this,d,e,g,f,h,k,l,m,r;return I(function(p){switch(p.g){case 1:if(!c.g.inputs)return p.return();d=1E3*(void 0===b||null===b?performance.now():b);return F(p,c.D,2);case 2:return F(p,c.initialize(),3);case 3:e=new c.h.PacketDataList;g=C(Object.keys(a));for(f=g.next();!f.done;f=g.next())if(h=f.value,k=c.g.inputs[h]){a:{var n=a[h];switch(k.type){case "video":var q=c.o[k.stream];q||(q=new rc(c.h,c.G),c.o[k.stream]=q);0===q.l&&(q.l=q.h.createTexture());if("undefined"!==typeof HTMLVideoElement&&
+n instanceof HTMLVideoElement){var t=n.videoWidth;var w=n.videoHeight;}else "undefined"!==typeof HTMLImageElement&&n instanceof HTMLImageElement?(t=n.naturalWidth,w=n.naturalHeight):(t=n.width,w=n.height);w={glName:q.l,width:t,height:w};t=q.g;t.canvas.width=w.width;t.canvas.height=w.height;t.activeTexture(t.TEXTURE0);q.h.bindTexture2d(q.l);t.texImage2D(t.TEXTURE_2D,0,t.RGBA,t.RGBA,t.UNSIGNED_BYTE,n);q.h.bindTexture2d(0);q=w;break a;case "detections":q=c.o[k.stream];q||(q=new uc(c.h),c.o[k.stream]=q);
+q.data||(q.data=new q.g.DetectionListData);q.data.reset(n.length);for(w=0;w<n.length;++w){t=n[w];var v=q.data,A=v.setBoundingBox,H=w;var E=t.ea;var u=new lc;W(u,1,E.ka);W(u,2,E.la);W(u,3,E.height);W(u,4,E.width);W(u,5,E.rotation);W(u,6,E.ia);E=Vb(u,mc);A.call(v,H,E);if(t.Y)for(v=0;v<t.Y.length;++v){u=t.Y[v];var z=u.visibility?!0:!1;A=q.data;H=A.addNormalizedLandmark;E=w;u=Object.assign(Object.assign({},u),{visibility:z?u.visibility:0});z=new gc;W(z,1,u.x);W(z,2,u.y);W(z,3,u.z);u.visibility&&W(z,4,
+u.visibility);u=Vb(z,hc);H.call(A,E,u);}if(t.V)for(v=0;v<t.V.length;++v)A=q.data,H=A.addClassification,E=w,u=t.V[v],z=new bc,W(z,2,u.score),u.index&&W(z,1,u.index),u.label&&W(z,3,u.label),u.displayName&&W(z,4,u.displayName),u=Vb(z,cc),H.call(A,E,u);}q=q.data;break a;default:q={};}}l=q;m=k.stream;switch(k.type){case "video":e.pushTexture2d(Object.assign(Object.assign({},l),{stream:m,timestamp:d}));break;case "detections":r=l;r.stream=m;r.timestamp=d;e.pushDetectionList(r);break;default:throw Error("Unknown input config type: '"+
+k.type+"'");}}c.i.send(e);return F(p,c.D,4);case 4:e.delete(),p.g=0;}})};
+function Gc(a,b,c){var d,e,g,f,h,k,l,m,r,p,n,q,t,w;return I(function(v){switch(v.g){case 1:if(!c)return v.return(b);d={};e=0;g=C(Object.keys(c));for(f=g.next();!f.done;f=g.next())h=f.value,k=c[h],"string"!==typeof k&&"texture"===k.type&&void 0!==b[k.stream]&&++e;1<e&&(a.I=!1);l=C(Object.keys(c));f=l.next();case 2:if(f.done){v.g=4;break}m=f.value;r=c[m];if("string"===typeof r)return t=d,w=m,F(v,Hc(a,m,b[r]),14);p=b[r.stream];if("detection_list"===r.type){if(p){var A=p.getRectList();for(var H=p.getLandmarksList(),
+E=p.getClassificationsList(),u=[],z=0;z<A.size();++z){var P=Ub(A.get(z),lc,mc);P={ea:{ka:X(P,1),la:X(P,2),height:X(P,3),width:X(P,4),rotation:X(P,5,0),ia:kb(P,6)},Y:ib(Ub(H.get(z),ic,kc),gc,1).map(pc),V:oc(Ub(E.get(z),dc,fc))};u.push(P);}A=u;}else A=[];d[m]=A;v.g=7;break}if("proto_list"===r.type){if(p){A=Array(p.size());for(H=0;H<p.size();H++)A[H]=p.get(H);p.delete();}else A=[];d[m]=A;v.g=7;break}if(void 0===p){v.g=3;break}if("float_list"===r.type){d[m]=p;v.g=7;break}if("proto"===r.type){d[m]=p;v.g=
+7;break}if("texture"!==r.type)throw Error("Unknown output config type: '"+r.type+"'");n=a.u[m];n||(n=new rc(a.h,a.G),a.u[m]=n);return F(v,sc(n,p,a.I),13);case 13:q=v.h,d[m]=q;case 7:r.transform&&d[m]&&(d[m]=r.transform(d[m]));v.g=3;break;case 14:t[w]=v.h;case 3:f=l.next();v.g=2;break;case 4:return v.return(d)}})}
+function Hc(a,b,c){var d;return I(function(e){return "number"===typeof c||c instanceof Uint8Array||c instanceof a.h.Uint8BlobList?e.return(c):c instanceof a.h.Texture2dDataOut?(d=a.u[b],d||(d=new rc(a.h,a.G),a.u[b]=d),e.return(sc(d,c,a.I))):e.return(void 0)})}
+function Ec(a,b){for(var c=b.name||"$",d=[].concat(ea(b.wants)),e=new a.h.StringList,g=C(b.wants),f=g.next();!f.done;f=g.next())e.push_back(f.value);g=a.h.PacketListener.implement({onResults:function(h){for(var k={},l=0;l<b.wants.length;++l)k[d[l]]=h.get(l);var m=a.listeners[c];m&&(a.D=Gc(a,k,b.outs).then(function(r){r=m(r);for(var p=0;p<b.wants.length;++p){var n=k[d[p]];"object"===typeof n&&n.hasOwnProperty&&n.hasOwnProperty("delete")&&n.delete();}r&&(a.D=r);}));}});a.i.attachMultiListener(e,g);e.delete();}
+x.onResults=function(a,b){this.listeners[b||"$"]=a;};J("Solution",Ac);J("OptionType",{BOOL:0,NUMBER:1,ma:2,0:"BOOL",1:"NUMBER",2:"STRING"});function Ic(a){void 0===a&&(a=0);return 1===a?"hand_landmark_full.tflite":"hand_landmark_lite.tflite"}
+function Jc(a){var b=this;a=a||{};this.g=new Ac({locateFile:a.locateFile,files:function(c){return [{url:"hands_solution_packed_assets_loader.js"},{simd:!1,url:"hands_solution_wasm_bin.js"},{simd:!0,url:"hands_solution_simd_wasm_bin.js"},{data:!0,url:Ic(c.modelComplexity)}]},graph:{url:"hands.binarypb"},inputs:{image:{type:"video",stream:"input_frames_gpu"}},listeners:[{wants:["multi_hand_landmarks","multi_hand_world_landmarks","image_transformed","multi_handedness"],outs:{image:"image_transformed",
+multiHandLandmarks:{type:"proto_list",stream:"multi_hand_landmarks",transform:qc},multiHandWorldLandmarks:{type:"proto_list",stream:"multi_hand_world_landmarks",transform:qc},multiHandedness:{type:"proto_list",stream:"multi_handedness",transform:function(c){return c.map(function(d){return oc(Ub(d,dc,fc))[0]})}}}}],options:{useCpuInference:{type:0,graphOptionXref:{calculatorType:"InferenceCalculator",fieldName:"use_cpu_inference"},default:"object"!==typeof window||void 0===window.navigator?!1:"iPad Simulator;iPhone Simulator;iPod Simulator;iPad;iPhone;iPod".split(";").includes(navigator.platform)||
 navigator.userAgent.includes("Mac")&&"ontouchend"in document},selfieMode:{type:0,graphOptionXref:{calculatorType:"GlScalerCalculator",calculatorIndex:1,fieldName:"flip_horizontal"}},maxNumHands:{type:1,graphOptionXref:{calculatorType:"ConstantSidePacketCalculator",calculatorName:"ConstantSidePacketCalculator",fieldName:"int_value"}},modelComplexity:{type:1,graphOptionXref:{calculatorType:"ConstantSidePacketCalculator",calculatorName:"ConstantSidePacketCalculatorModelComplexity",fieldName:"int_value"},
-onChange:function(c){var d,e,g;return H(function(f){if(1==f.g)return d=qc(c),e="third_party/mediapipe/modules/hand_landmark/"+d,F(f,kc(b.g,d),2);g=f.h;b.g.overrideFile(e,g);return f.return(!0)})}},minDetectionConfidence:{type:1,graphOptionXref:{calculatorType:"TensorsToDetectionsCalculator",calculatorName:"handlandmarktrackinggpu__palmdetectiongpu__TensorsToDetectionsCalculator",fieldName:"min_score_thresh"}},minTrackingConfidence:{type:1,graphOptionXref:{calculatorType:"ThresholdingCalculator",calculatorName:"handlandmarktrackinggpu__handlandmarkgpu__ThresholdingCalculator",
-fieldName:"threshold"}}}});}x=rc.prototype;x.close=function(){this.g.close();return Promise.resolve()};x.onResults=function(a){this.g.onResults(a);};x.initialize=function(){var a=this;return H(function(b){return F(b,a.g.initialize(),0)})};x.reset=function(){this.g.reset();};x.send=function(a){var b=this;return H(function(c){return F(c,b.g.send(a),0)})};x.setOptions=function(a){this.g.setOptions(a);};J("Hands",rc);
-J("HAND_CONNECTIONS",[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[0,17],[17,18],[18,19],[19,20]]);J("VERSION","0.4.1635986972");}).call(undefined);
+onChange:function(c){var d,e,g;return I(function(f){if(1==f.g)return d=Ic(c),e="third_party/mediapipe/modules/hand_landmark/"+d,F(f,Cc(b.g,d),2);g=f.h;b.g.overrideFile(e,g);return f.return(!0)})}},minDetectionConfidence:{type:1,graphOptionXref:{calculatorType:"TensorsToDetectionsCalculator",calculatorName:"handlandmarktrackinggpu__palmdetectiongpu__TensorsToDetectionsCalculator",fieldName:"min_score_thresh"}},minTrackingConfidence:{type:1,graphOptionXref:{calculatorType:"ThresholdingCalculator",calculatorName:"handlandmarktrackinggpu__handlandmarkgpu__ThresholdingCalculator",
+fieldName:"threshold"}}}});}x=Jc.prototype;x.close=function(){this.g.close();return Promise.resolve()};x.onResults=function(a){this.g.onResults(a);};x.initialize=function(){var a=this;return I(function(b){return F(b,a.g.initialize(),0)})};x.reset=function(){this.g.reset();};x.send=function(a){var b=this;return I(function(c){return F(c,b.g.send(a),0)})};x.setOptions=function(a){this.g.setOptions(a);};J("Hands",Jc);
+J("HAND_CONNECTIONS",[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[0,17],[17,18],[18,19],[19,20]]);J("VERSION","0.4.1646424915");}).call(undefined);
 
 var hands$1 = /*#__PURE__*/Object.freeze({
 	__proto__: null
@@ -1288,7 +1291,7 @@ class Environment {
         if (this.platform != null) {
             if (!(env$1().getBool('IS_TEST') || env$1().getBool('PROD'))) {
                 console.warn(`Platform ${this.platformName} has already been set. ` +
-                    `Overwriting the platform with ${platform}.`);
+                    `Overwriting the platform with ${platformName}.`);
             }
         }
         this.platformName = platformName;
@@ -1747,6 +1750,7 @@ const Conv3DBackpropFilterV2 = 'Conv3DBackpropFilterV2';
 const Conv3DBackpropInputV2 = 'Conv3DBackpropInputV2';
 const Cos = 'Cos';
 const Cosh = 'Cosh';
+const Cumprod = 'Cumprod';
 const Cumsum = 'Cumsum';
 const CropAndResize = 'CropAndResize';
 const DenseBincount = 'DenseBincount';
@@ -1793,6 +1797,7 @@ const LogicalAnd = 'LogicalAnd';
 const LogicalNot = 'LogicalNot';
 const LogicalOr = 'LogicalOr';
 const LogSoftmax = 'LogSoftmax';
+const LowerBound = 'LowerBound';
 const LRN = 'LRN';
 const LRNGrad = 'LRNGrad';
 const Max = 'Max';
@@ -1836,6 +1841,7 @@ const Reverse = 'Reverse';
 const Round = 'Round';
 const Rsqrt = 'Rsqrt';
 const ScatterNd = 'ScatterNd';
+const SearchSorted = 'SearchSorted';
 const Select = 'Select';
 const Selu = 'Selu';
 const Slice = 'Slice';
@@ -1870,6 +1876,7 @@ const Transpose = 'Transpose';
 const Unique = 'Unique';
 const Unpack = 'Unpack';
 const UnsortedSegmentSum = 'UnsortedSegmentSum';
+const UpperBound = 'UpperBound';
 const ZerosLike = 'ZerosLike';
 /**
  * TensorFlow.js-only kernels
@@ -3361,10 +3368,10 @@ Long$1.fromBytesBE = function fromBytesBE(bytes, unsigned) {
     );
 };
 
-var LongExports = /*#__PURE__*/Object.freeze(/*#__PURE__*/_mergeNamespaces({
+var LongExports = /*#__PURE__*/_mergeNamespaces({
 	__proto__: null,
 	'default': long
-}, [long]));
+}, [long]);
 
 /**
  * @license
@@ -5176,8 +5183,7 @@ class Engine {
                     if (outInfo.rank != null) {
                         return outInfo;
                     }
-                    const { dataId, shape, dtype } = outInfo;
-                    return this.makeTensorFromDataId(dataId, shape, dtype);
+                    return this.makeTensorFromTensorInfo(outInfo);
                 });
                 // Save any required inputs and outputs.
                 // Do not save unless we are recording to the tape. Otherwise it would
@@ -5323,12 +5329,12 @@ class Engine {
         return t;
     }
     /**
-     * Internal method used by backends. Makes a new tensor
-     * that is a wrapper around an existing data id. It doesn't create
-     * a new data id, only increments the ref count used in memory tracking.
+     * Internal method used by backends. Makes a new tensor that is a wrapper
+     * around an existing data id in TensorInfo. It doesn't create a new data id,
+     * only increments the ref count used in memory tracking.
      */
-    makeTensorFromDataId(dataId, shape, dtype, backend) {
-        dtype = dtype || 'float32';
+    makeTensorFromTensorInfo(tensorInfo, backend) {
+        const { dataId, shape, dtype } = tensorInfo;
         const t = new Tensor(shape, dtype, dataId, this.nextTensorId());
         this.trackTensor(t, backend);
         return t;
@@ -5816,6 +5822,8 @@ ENV$1.registerFlag('IS_TEST', () => false);
 ENV$1.registerFlag('CHECK_COMPUTATION_FOR_ERRORS', () => true);
 /** Whether the backend needs to wrap input to imageBitmap. */
 ENV$1.registerFlag('WRAP_TO_IMAGEBITMAP', () => false);
+/** Experimental flag, whether enter compile only phase. */
+ENV$1.registerFlag('ENGINE_COMPILE_ONLY', () => false);
 
 var lookup = [];
 var revLookup = [];
@@ -6054,6 +6062,11 @@ var INSPECT_MAX_BYTES = 50;
 Buffer.TYPED_ARRAY_SUPPORT = global$1.TYPED_ARRAY_SUPPORT !== undefined
   ? global$1.TYPED_ARRAY_SUPPORT
   : true;
+
+/*
+ * Export kMaxLength after typed array support is determined.
+ */
+kMaxLength();
 
 function kMaxLength () {
   return Buffer.TYPED_ARRAY_SUPPORT
@@ -9676,7 +9689,7 @@ class PlatformNode {
         return new this.util.TextDecoder(encoding).decode(bytes);
     }
 }
-if (env$1().get('IS_NODE')) {
+if (env$1().get('IS_NODE') && !env$1().get('IS_BROWSER')) {
     env$1().setPlatform('node', new PlatformNode());
 }
 
@@ -10876,12 +10889,16 @@ const matMul$1 = op({ matMul_ });
  * value `onValue` (defaults to 1), while all other locations take value
  * `offValue` (defaults to 0). If `indices` is rank `R`, the output has rank
  * `R+1` with the last axis of size `depth`.
+ * `indices` used to encode prediction class must start from 0. For example,
+ *  if you have 3 classes of data, class 1 should be encoded as 0, class 2
+ *  should be 1, and class 3 should be 2.
  *
  * ```js
  * tf.oneHot(tf.tensor1d([0, 1], 'int32'), 3).print();
  * ```
  *
- * @param indices `tf.Tensor` of indices with dtype `int32`.
+ * @param indices `tf.Tensor` of indices with dtype `int32`. Indices must
+ * start from 0.
  * @param depth The depth of the one hot dimension.
  * @param onValue A number used to fill in the output when the index matches
  * the location.
@@ -12555,7 +12572,7 @@ var test_util = /*#__PURE__*/Object.freeze({
 
 /** @license See the LICENSE file. */
 // This code is auto-generated, do not modify this file!
-const version$1 = '3.13.0';
+const version$1 = '3.17.0';
 
 /**
  * @license
@@ -15650,6 +15667,53 @@ const cosh = op({ cosh_ });
 
 /**
  * @license
+ * Copyright 2022 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the 'License');
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an 'AS IS' BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes the cumulative product of a `tf.Tensor` along `axis`.
+ *
+ * ```js
+ * const x = tf.tensor([1, 2, 3, 4]);
+ * x.cumprod().print();
+ * ```
+ * ```js
+ * const x = tf.tensor([[1, 2], [3, 4]]);
+ * x.cumprod().print();
+ * ```
+ *
+ * @param x The input tensor to cumulatively multiply.
+ * @param axis The axis along which to multiply. Optional. Defaults to 0.
+ * @param exclusive Whether to perform exclusive cumulative product. Optional.
+ *     Defaults to false. If set to true then the product of each tensor entry
+ *     does not include its own value, but only the values previous to it
+ *     along the specified axis.
+ * @param reverse Whether to multiply in the opposite direction. Optional.
+ *     Defaults to false.
+ *
+ * @doc {heading: 'Operations', subheading: 'Scan'}
+ */
+function cumprod_(x, axis = 0, exclusive = false, reverse = false) {
+    const $x = convertToTensor(x, 'x', 'cumprod');
+    const inputs = { x: $x };
+    const attrs = { axis, exclusive, reverse };
+    return ENGINE.runKernel(Cumprod, inputs, attrs);
+}
+const cumprod = op({ cumprod_ });
+
+/**
+ * @license
  * Copyright 2018 Google LLC. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16461,6 +16525,589 @@ function erf_(x) {
     return ENGINE.runKernel(Erf, inputs);
 }
 const erf = op({ erf_ });
+
+/**
+ * @license
+ * Copyright 2017 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Returns true if the axis specifies the inner most dimensions of the
+ * array.
+ */
+function axesAreInnerMostDims(axes, rank) {
+    for (let i = 0; i < axes.length; ++i) {
+        if (axes[axes.length - i - 1] !== rank - 1 - i) {
+            return false;
+        }
+    }
+    return true;
+}
+function combineLocations(outputLoc, reduceLoc, axes) {
+    const rank = outputLoc.length + reduceLoc.length;
+    const loc = [];
+    let outIdx = 0;
+    let reduceIdx = 0;
+    for (let dim = 0; dim < rank; dim++) {
+        if (axes.indexOf(dim) === -1) {
+            loc.push(outputLoc[outIdx++]);
+        }
+        else {
+            loc.push(reduceLoc[reduceIdx++]);
+        }
+    }
+    return loc;
+}
+function computeOutAndReduceShapes(aShape, axes) {
+    const outShape = [];
+    const rank = aShape.length;
+    for (let dim = 0; dim < rank; dim++) {
+        if (axes.indexOf(dim) === -1) {
+            outShape.push(aShape[dim]);
+        }
+    }
+    const reduceShape = axes.map(dim => aShape[dim]);
+    return [outShape, reduceShape];
+}
+function expandShapeToKeepDim(shape, axes) {
+    const reduceSubShape = axes.map(x => 1);
+    return combineLocations(shape, reduceSubShape, axes);
+}
+function assertAxesAreInnerMostDims(msg, axes, rank) {
+    assert(axesAreInnerMostDims(axes, rank), () => `${msg} supports only inner-most axes for now. ` +
+        `Got axes ${axes} and rank-${rank} input.`);
+}
+/**
+ * Returns the axes permutation to be used with `tf.transpose`, if such
+ * permutation is necessary. Otherwise it returns null. This method is used by
+ * operations that operate only on inner-most axes.
+ */
+function getAxesPermutation(axes, rank) {
+    if (axesAreInnerMostDims(axes, rank)) {
+        return null;
+    }
+    const result = [];
+    for (let i = 0; i < rank; ++i) {
+        if (axes.indexOf(i) === -1) {
+            result.push(i);
+        }
+    }
+    axes.forEach(axis => result.push(axis));
+    return result;
+}
+/** Returns the axes permutation that undoes the original permutation. */
+function getUndoAxesPermutation(axes) {
+    return axes.map((axis, i) => [i, axis])
+        .sort((a, b) => a[1] - b[1])
+        .map(x => x[0]);
+}
+function getInnerMostAxes(numAxes, rank) {
+    const res = [];
+    for (let i = rank - numAxes; i < rank; ++i) {
+        res.push(i);
+    }
+    return res;
+}
+
+/**
+ * @license
+ * Copyright 2020 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes the maximum of elements across dimensions of a `tf.Tensor`.
+ *
+ * Reduces the input along the dimensions given in `axes`. Unless `keepDims`
+ * is true, the rank of the `tf.Tensor` is reduced by 1 for each entry in
+ * `axes`. If `keepDims` is true, the reduced dimensions are retained with
+ * length 1. If `axes` has no entries, all dimensions are reduced, and an
+ * `tf.Tensor` with a single element is returned.
+ *
+ * ```js
+ * const x = tf.tensor1d([1, 2, 3]);
+ *
+ * x.max().print();  // or tf.max(x)
+ * ```
+ *
+ * ```js
+ * const x = tf.tensor2d([1, 2, 3, 4], [2, 2]);
+ *
+ * const axis = 1;
+ * x.max(axis).print();  // or tf.max(x, axis)
+ * ```
+ *
+ * @param x The input tensor.
+ * @param axis The dimension(s) to reduce. By default it reduces
+ *     all dimensions.
+ * @param keepDims If true, retains reduced dimensions with size 1.
+ *
+ * @doc {heading: 'Operations', subheading: 'Reduction'}
+ */
+function max_(x, axis = null, keepDims = false) {
+    const $x = convertToTensor(x, 'x', 'max');
+    const inputs = { x: $x };
+    const attrs = { reductionIndices: axis, keepDims };
+    return ENGINE.runKernel(Max, inputs, attrs);
+}
+const max = op({ max_ });
+
+/**
+ * @license
+ * Copyright 2020 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes the minimum value from the input.
+ *
+ * Reduces the input along the dimensions given in `axes`. Unless `keepDims`
+ * is true, the rank of the array is reduced by 1 for each entry in `axes`.
+ * If `keepDims` is true, the reduced dimensions are retained with length 1.
+ * If `axes` has no entries, all dimensions are reduced, and an array with a
+ * single element is returned.
+ *
+ * ```js
+ * const x = tf.tensor1d([1, 2, 3]);
+ *
+ * x.min().print();  // or tf.min(x)
+ * ```
+ *
+ * ```js
+ * const x = tf.tensor2d([1, 2, 3, 4], [2, 2]);
+ *
+ * const axis = 1;
+ * x.min(axis).print();  // or tf.min(x, axis)
+ * ```
+ *
+ * @param x The input Tensor.
+ * @param axis The dimension(s) to reduce. By default it reduces
+ *     all dimensions.
+ * @param keepDims If true, retains reduced dimensions with size 1.
+ *
+ * @doc {heading: 'Operations', subheading: 'Reduction'}
+ */
+function min_(x, axis = null, keepDims = false) {
+    const $x = convertToTensor(x, 'x', 'min');
+    const inputs = { x: $x };
+    const attrs = { axis, keepDims };
+    // tslint:disable-next-line: no-unnecessary-type-assertion
+    return ENGINE.runKernel(Min, inputs, attrs);
+}
+const min = op({ min_ });
+
+/**
+ * @license
+ * Copyright 2020 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes the power of one `tf.Tensor` to another. Supports broadcasting.
+ *
+ * Given a `tf.Tensor` x and a `tf.Tensor` y, this operation computes x^y for
+ * corresponding elements in x and y. The result's dtype will be the upcasted
+ * type of the `base` and `exp` dtypes.
+ *
+ * ```js
+ * const a = tf.tensor([[2, 3], [4, 5]])
+ * const b = tf.tensor([[1, 2], [3, 0]]).toInt();
+ *
+ * a.pow(b).print();  // or tf.pow(a, b)
+ * ```
+ *
+ * ```js
+ * const a = tf.tensor([[1, 2], [3, 4]])
+ * const b = tf.tensor(2).toInt();
+ *
+ * a.pow(b).print();  // or tf.pow(a, b)
+ * ```
+ * We also expose `powStrict` which has the same signature as this op and
+ * asserts that `base` and `exp` are the same shape (does not broadcast).
+ *
+ * @param base The base `tf.Tensor` to pow element-wise.
+ * @param exp The exponent `tf.Tensor` to pow element-wise.
+ *
+ * @doc {heading: 'Operations', subheading: 'Arithmetic'}
+ */
+function pow_(base, exp) {
+    let $base = convertToTensor(base, 'base', 'pow');
+    let $exp = convertToTensor(exp, 'exp', 'pow');
+    [$base, $exp] = makeTypesMatch($base, $exp);
+    const inputs = { a: $base, b: $exp };
+    return ENGINE.runKernel(Pow, inputs);
+}
+const pow = op({ pow_ });
+
+/**
+ * @license
+ * Copyright 2018 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Creates rank-0 `tf.Tensor` (scalar) with the provided value and dtype.
+ *
+ * The same functionality can be achieved with `tf.tensor`, but in general
+ * we recommend using `tf.scalar` as it makes the code more readable.
+ *
+ * ```js
+ * tf.scalar(3.14).print();
+ * ```
+ *
+ * @param value The value of the scalar.
+ * @param dtype The data type.
+ *
+ * @doc {heading: 'Tensors', subheading: 'Creation'}
+ */
+function scalar(value, dtype) {
+    if (((isTypedArray(value) && dtype !== 'string') || Array.isArray(value)) &&
+        dtype !== 'complex64') {
+        throw new Error('Error creating a new Scalar: value must be a primitive ' +
+            '(number|boolean|string)');
+    }
+    if (dtype === 'string' && isTypedArray(value) &&
+        !(value instanceof Uint8Array)) {
+        throw new Error('When making a scalar from encoded string, ' +
+            'the value must be `Uint8Array`.');
+    }
+    const shape = [];
+    const inferredShape = [];
+    return makeTensor(value, shape, inferredShape, dtype);
+}
+
+/**
+ * @license
+ * Copyright 2018 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes square root of the input `tf.Tensor` element-wise: `y = sqrt(x)`
+ *
+ * ```js
+ * const x = tf.tensor1d([1, 2, 4, -1]);
+ *
+ * x.sqrt().print();  // or tf.sqrt(x)
+ * ```
+ * @param x The input tensor.
+ *
+ * @doc {heading: 'Operations', subheading: 'Basic math'}
+ */
+function sqrt_(x) {
+    const $x = convertToTensor(x, 'x', 'sqrt', 'float32');
+    const inputs = { x: $x };
+    return ENGINE.runKernel(Sqrt, inputs);
+}
+const sqrt = op({ sqrt_ });
+
+/**
+ * @license
+ * Copyright 2019 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes square of `x` element-wise: `x ^ 2`
+ *
+ * ```js
+ * const x = tf.tensor1d([1, 2, Math.sqrt(2), -1]);
+ *
+ * x.square().print();  // or tf.square(x)
+ * ```
+ * @param x The input Tensor.
+ *
+ * @doc {heading: 'Operations', subheading: 'Basic math'}
+ */
+function square_(x) {
+    const $x = convertToTensor(x, 'x', 'square');
+    const attrs = {};
+    return ENGINE.runKernel('Square', { x: $x }, attrs);
+}
+const square = op({ square_ });
+
+/**
+ * @license
+ * Copyright 2018 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes the sum of elements across dimensions of a `tf.Tensor`.
+ *
+ * Reduces the input along the dimensions given in `axes`. Unless `keepDims`
+ * is true, the rank of the `tf.Tensor` is reduced by 1 for each entry in
+ * `axes`. If `keepDims` is true, the reduced dimensions are retained with
+ * length 1. If axes has no entries, all dimensions are reduced, and a
+ * `tf.Tensor` with a single element is returned.
+ *
+ * ```js
+ * const x = tf.tensor1d([1, 2, 3]);
+ *
+ * x.sum().print();  // or tf.sum(x)
+ * ```
+ *
+ * ```js
+ * const x = tf.tensor2d([1, 2, 3, 4], [2, 2]);
+ *
+ * const axis = 1;
+ * x.sum(axis).print();  // or tf.sum(x, axis)
+ * ```
+ *
+ * @param x The input tensor to compute the sum over. If the dtype is `bool`
+ *   it will be converted to `int32` and the output dtype will be `int32`.
+ * @param axis The dimension(s) to reduce. By default it reduces
+ *     all dimensions.
+ * @param keepDims If true, retains reduced dimensions with size 1.
+ *
+ * @doc {heading: 'Operations', subheading: 'Reduction'}
+ */
+function sum_(x, axis = null, keepDims = false) {
+    let $x = convertToTensor(x, 'x', 'sum');
+    if ($x.dtype === 'bool') {
+        $x = cast($x, 'int32');
+    }
+    const inputs = { x: $x };
+    const attrs = { axis, keepDims };
+    return ENGINE.runKernel(Sum, inputs, attrs);
+}
+const sum = op({ sum_ });
+
+/**
+ * @license
+ * Copyright 2018 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes the norm of scalar, vectors, and matrices.
+ * This function can compute several different vector norms (the 1-norm, the
+ * Euclidean or 2-norm, the inf-norm, and in general the p-norm for p > 0)
+ * and matrix norms (Frobenius, 1-norm, and inf-norm).
+ *
+ * ```js
+ * const x = tf.tensor1d([1, 2, 3, 4]);
+ *
+ * x.norm().print();  // or tf.norm(x)
+ * ```
+ *
+ * @param x The input array.
+ * @param ord Optional. Order of the norm. Supported norm types are
+ * following:
+ *
+ *  | ord        | norm for matrices         | norm for vectors
+ *  |------------|---------------------------|---------------------
+ *  |'euclidean' |Frobenius norm             |2-norm
+ *  |'fro'       |Frobenius norm	           |
+ *  |Infinity    |max(sum(abs(x), axis=1))   |max(abs(x))
+ *  |-Infinity   |min(sum(abs(x), axis=1))   |min(abs(x))
+ *  |1           |max(sum(abs(x), axis=0))   |sum(abs(x))
+ *  |2           |                           |sum(abs(x)^2)^1/2*
+ *
+ * @param axis Optional. If axis is null (the default), the input is
+ * considered a vector and a single vector norm is computed over the entire
+ * set of values in the Tensor, i.e. norm(x, ord) is equivalent
+ * to norm(x.reshape([-1]), ord). If axis is a integer, the input
+ * is considered a batch of vectors, and axis determines the axis in x
+ * over which to compute vector norms. If axis is a 2-tuple of integer it is
+ * considered a batch of matrices and axis determines the axes in NDArray
+ * over which to compute a matrix norm.
+ * @param keepDims Optional. If true, the norm have the same dimensionality
+ * as the input.
+ *
+ * @doc {heading: 'Operations', subheading: 'Matrices'}
+ */
+function norm_(x, ord = 'euclidean', axis = null, keepDims = false) {
+    x = convertToTensor(x, 'x', 'norm');
+    const norm = normImpl(x, ord, axis);
+    let keepDimsShape = norm.shape;
+    if (keepDims) {
+        const axes = parseAxisParam(axis, x.shape);
+        keepDimsShape = expandShapeToKeepDim(norm.shape, axes);
+    }
+    return reshape(norm, keepDimsShape);
+}
+function normImpl(x, p, axis = null) {
+    if (x.rank === 0) {
+        return abs(x);
+    }
+    // consider vector when no axis is specified
+    if (x.rank !== 1 && axis === null) {
+        return normImpl(reshape(x, [-1]), p, axis);
+    }
+    // vector
+    if (x.rank === 1 || typeof axis === 'number' ||
+        Array.isArray(axis) && axis.length === 1) {
+        if (p === 1) {
+            return sum(abs(x), axis);
+        }
+        if (p === Infinity) {
+            return max(abs(x), axis);
+        }
+        if (p === -Infinity) {
+            return min(abs(x), axis);
+        }
+        if (p === 'euclidean' || p === 2) {
+            // norm(x, 2) = sum(abs(xi) ^ 2) ^ 1/2
+            return sqrt(sum(pow(abs(x), scalar(2, 'int32')), axis));
+        }
+        throw new Error(`Error in norm: invalid ord value: ${p}`);
+    }
+    // matrix (assumption axis[0] < axis[1])
+    if (Array.isArray(axis) && axis.length === 2) {
+        if (p === 1) {
+            return max(sum(abs(x), axis[0]), axis[1] - 1);
+        }
+        if (p === Infinity) {
+            return max(sum(abs(x), axis[1]), axis[0]);
+        }
+        if (p === -Infinity) {
+            return min(sum(abs(x), axis[1]), axis[0]);
+        }
+        if (p === 'fro' || p === 'euclidean') {
+            // norm(x) = sqrt(sum(pow(x, 2)))
+            return sqrt(sum(square(x), axis));
+        }
+        throw new Error(`Error in norm: invalid ord value: ${p}`);
+    }
+    throw new Error(`Error in norm: invalid axis: ${axis}`);
+}
+const norm = op({ norm_ });
+
+/**
+ * @license
+ * Copyright 2022 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes the euclidean norm of scalar, vectors, and matrices.
+ *
+ * ```js
+ * const x = tf.tensor1d([1, 2, 3, 4]);
+ *
+ * x.euclideanNorm().print();  // or tf.euclideanNorm(x)
+ * ```
+ *
+ * @param x The input array.
+ * @param axis Optional. If axis is null (the default), the input is
+ * considered a vector and a single vector norm is computed over the entire
+ * set of values in the Tensor, i.e. euclideanNorm(x) is equivalent
+ * to euclideanNorm(x.reshape([-1])). If axis is a integer, the input
+ * is considered a batch of vectors, and axis determines the axis in x
+ * over which to compute vector norms. If axis is a 2-tuple of integer it is
+ * considered a batch of matrices and axis determines the axes in NDArray
+ * over which to compute a matrix norm.
+ * @param keepDims Optional. If true, the norm have the same dimensionality
+ * as the input.
+ *
+ * @doc {heading: 'Operations', subheading: 'Matrices'}
+ */
+function euclideanNorm_(x, axis = null, keepDims = false) {
+    return norm(x, 'euclidean', axis, keepDims);
+}
+const euclideanNorm = op({ euclideanNorm_ });
 
 /**
  * @license
@@ -17775,59 +18422,6 @@ const logSigmoid = op({ logSigmoid_ });
  * =============================================================================
  */
 /**
- * Computes the maximum of elements across dimensions of a `tf.Tensor`.
- *
- * Reduces the input along the dimensions given in `axes`. Unless `keepDims`
- * is true, the rank of the `tf.Tensor` is reduced by 1 for each entry in
- * `axes`. If `keepDims` is true, the reduced dimensions are retained with
- * length 1. If `axes` has no entries, all dimensions are reduced, and an
- * `tf.Tensor` with a single element is returned.
- *
- * ```js
- * const x = tf.tensor1d([1, 2, 3]);
- *
- * x.max().print();  // or tf.max(x)
- * ```
- *
- * ```js
- * const x = tf.tensor2d([1, 2, 3, 4], [2, 2]);
- *
- * const axis = 1;
- * x.max(axis).print();  // or tf.max(x, axis)
- * ```
- *
- * @param x The input tensor.
- * @param axis The dimension(s) to reduce. By default it reduces
- *     all dimensions.
- * @param keepDims If true, retains reduced dimensions with size 1.
- *
- * @doc {heading: 'Operations', subheading: 'Reduction'}
- */
-function max_(x, axis = null, keepDims = false) {
-    const $x = convertToTensor(x, 'x', 'max');
-    const inputs = { x: $x };
-    const attrs = { reductionIndices: axis, keepDims };
-    return ENGINE.runKernel(Max, inputs, attrs);
-}
-const max = op({ max_ });
-
-/**
- * @license
- * Copyright 2020 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
  * Subtracts two `tf.Tensor`s element-wise, A - B. Supports broadcasting.
  *
  * ```js
@@ -17858,63 +18452,6 @@ function sub_(a, b) {
     return ENGINE.runKernel(Sub, inputs);
 }
 const sub = op({ sub_ });
-
-/**
- * @license
- * Copyright 2018 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
- * Computes the sum of elements across dimensions of a `tf.Tensor`.
- *
- * Reduces the input along the dimensions given in `axes`. Unless `keepDims`
- * is true, the rank of the `tf.Tensor` is reduced by 1 for each entry in
- * `axes`. If `keepDims` is true, the reduced dimensions are retained with
- * length 1. If axes has no entries, all dimensions are reduced, and a
- * `tf.Tensor` with a single element is returned.
- *
- * ```js
- * const x = tf.tensor1d([1, 2, 3]);
- *
- * x.sum().print();  // or tf.sum(x)
- * ```
- *
- * ```js
- * const x = tf.tensor2d([1, 2, 3, 4], [2, 2]);
- *
- * const axis = 1;
- * x.sum(axis).print();  // or tf.sum(x, axis)
- * ```
- *
- * @param x The input tensor to compute the sum over. If the dtype is `bool`
- *   it will be converted to `int32` and the output dtype will be `int32`.
- * @param axis The dimension(s) to reduce. By default it reduces
- *     all dimensions.
- * @param keepDims If true, retains reduced dimensions with size 1.
- *
- * @doc {heading: 'Operations', subheading: 'Reduction'}
- */
-function sum_(x, axis = null, keepDims = false) {
-    let $x = convertToTensor(x, 'x', 'sum');
-    if ($x.dtype === 'bool') {
-        $x = cast($x, 'int32');
-    }
-    const inputs = { x: $x };
-    const attrs = { axis, keepDims };
-    return ENGINE.runKernel(Sum, inputs, attrs);
-}
-const sum = op({ sum_ });
 
 /**
  * @license
@@ -17996,100 +18533,6 @@ function logSoftmax_(logits, axis = -1) {
     //            attrs as {} as NamedAttrMap);
 }
 const logSoftmax = op({ logSoftmax_ });
-
-/**
- * @license
- * Copyright 2017 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
- * Returns true if the axis specifies the inner most dimensions of the
- * array.
- */
-function axesAreInnerMostDims(axes, rank) {
-    for (let i = 0; i < axes.length; ++i) {
-        if (axes[axes.length - i - 1] !== rank - 1 - i) {
-            return false;
-        }
-    }
-    return true;
-}
-function combineLocations(outputLoc, reduceLoc, axes) {
-    const rank = outputLoc.length + reduceLoc.length;
-    const loc = [];
-    let outIdx = 0;
-    let reduceIdx = 0;
-    for (let dim = 0; dim < rank; dim++) {
-        if (axes.indexOf(dim) === -1) {
-            loc.push(outputLoc[outIdx++]);
-        }
-        else {
-            loc.push(reduceLoc[reduceIdx++]);
-        }
-    }
-    return loc;
-}
-function computeOutAndReduceShapes(aShape, axes) {
-    const outShape = [];
-    const rank = aShape.length;
-    for (let dim = 0; dim < rank; dim++) {
-        if (axes.indexOf(dim) === -1) {
-            outShape.push(aShape[dim]);
-        }
-    }
-    const reduceShape = axes.map(dim => aShape[dim]);
-    return [outShape, reduceShape];
-}
-function expandShapeToKeepDim(shape, axes) {
-    const reduceSubShape = axes.map(x => 1);
-    return combineLocations(shape, reduceSubShape, axes);
-}
-function assertAxesAreInnerMostDims(msg, axes, rank) {
-    assert(axesAreInnerMostDims(axes, rank), () => `${msg} supports only inner-most axes for now. ` +
-        `Got axes ${axes} and rank-${rank} input.`);
-}
-/**
- * Returns the axes permutation to be used with `tf.transpose`, if such
- * permutation is necessary. Otherwise it returns null. This method is used by
- * operations that operate only on inner-most axes.
- */
-function getAxesPermutation(axes, rank) {
-    if (axesAreInnerMostDims(axes, rank)) {
-        return null;
-    }
-    const result = [];
-    for (let i = 0; i < rank; ++i) {
-        if (axes.indexOf(i) === -1) {
-            result.push(i);
-        }
-    }
-    axes.forEach(axis => result.push(axis));
-    return result;
-}
-/** Returns the axes permutation that undoes the original permutation. */
-function getUndoAxesPermutation(axes) {
-    return axes.map((axis, i) => [i, axis])
-        .sort((a, b) => a[1] - b[1])
-        .map(x => x[0]);
-}
-function getInnerMostAxes(numAxes, rank) {
-    const res = [];
-    for (let i = rank - numAxes; i < rank; ++i) {
-        res.push(i);
-    }
-    return res;
-}
 
 /**
  * @license
@@ -18307,6 +18750,170 @@ function logicalXor_(a, b) {
     return logicalAnd(logicalOr(a, b), logicalNot(logicalAnd(a, b)));
 }
 const logicalXor = op({ logicalXor_ });
+
+/**
+ * @license
+ * Copyright 2022 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+const INT32_MAX = 2147483648;
+/**
+ * Searches for where a value would go in a sorted sequence.
+ *
+ * This is not a method for checking containment (like javascript in).
+ *
+ * The typical use case for this operation is "binning", "bucketing", or
+ * "discretizing". The values are assigned to bucket-indices based on the edges
+ * listed in 'sortedSequence'. This operation returns the bucket-index for each
+ * value.
+ *
+ * The side argument controls which index is returned if a value lands exactly
+ * on an edge.
+ *
+ * The axis is not settable for this operation. It always operates on the
+ * innermost dimension (axis=-1). The operation will accept any number of outer
+ * dimensions.
+ *
+ * Note: This operation assumes that 'sortedSequence' is sorted along the
+ * innermost axis, maybe using 'sort(..., axis=-1)'. If the sequence is not
+ * sorted no error is raised and the content of the returned tensor is not well
+ * defined.
+ *
+ * ```js
+ * const edges = tf.tensor1d([-1, 3.3, 9.1, 10.0]);
+ * let values = tf.tensor1d([0.0, 4.1, 12.0]);
+ * const result1 = tf.searchSorted(edges, values, 'left');
+ * result1.print(); // [1, 2, 4]
+ *
+ * const seq = tf.tensor1d([0, 3, 9, 10, 10]);
+ * values = tf.tensor1d([0, 4, 10]);
+ * const result2 = tf.searchSorted(seq, values, 'left');
+ * result2.print(); // [0, 2, 3]
+ * const result3 = tf.searchSorted(seq, values, 'right');
+ * result3.print(); // [1, 2, 5]
+ *
+ * const sortedSequence = tf.tensor2d([[0., 3., 8., 9., 10.],
+ *                                     [1., 2., 3., 4., 5.]]);
+ * values = tf.tensor2d([[9.8, 2.1, 4.3],
+ *                       [0.1, 6.6, 4.5, ]]);
+ * const result4 = tf.searchSorted(sortedSequence, values, 'left');
+ * result4.print(); // [[4, 1, 2], [0, 5, 4]]
+ * ```
+ * @param sortedSequence: N-D. Sorted sequence.
+ * @param values: N-D. Search values.
+ * @param side: 'left'|'right'. Defaults to 'left'. 'left' corresponds to lower
+ *     bound and 'right' to upper bound.
+ * @return An N-D int32 tensor the size of values containing the result of
+ *     applying either lower bound or upper bound (depending on side) to each
+ *     value. The result is not a global index to the entire Tensor, but the
+ *     index in the last dimension.
+ * @doc {heading: 'Operations', subheading: 'Evaluation'}
+ */
+function searchSorted_(sortedSequence, values, side = 'left') {
+    const $sortedSequence = convertToTensor(sortedSequence, 'sortedSequence', 'searchSorted');
+    const $values = convertToTensor(values, 'values', 'searchSorted');
+    const sequenceSize = $sortedSequence.shape[$sortedSequence.shape.length - 1];
+    const valuesSize = $values.shape[$values.shape.length - 1];
+    const $sortedSequence2D = reshape($sortedSequence, [-1, sequenceSize]);
+    const $values2D = reshape($values, [-1, valuesSize]);
+    if ($sortedSequence2D.rank < 2) {
+        throw new Error(`Sorted input argument must be at least 2-dimensional`);
+    }
+    if ($sortedSequence2D.shape[0] !== $values2D.shape[0]) {
+        throw new Error(`Leading dimension of 'sortedSequence' and 'values' must match.`);
+    }
+    if (sizeFromShape($values2D.shape) >= INT32_MAX) {
+        throw new Error(`values tensor size must less than ${INT32_MAX}`);
+    }
+    if ($sortedSequence2D.shape[1] >= INT32_MAX) {
+        throw new Error(`trailing dim_size must less than ${INT32_MAX} for int32 output type, was ${$sortedSequence2D.shape[1]}`);
+    }
+    const inputs = {
+        sortedSequence: $sortedSequence2D,
+        values: $values2D,
+    };
+    const attrs = { side };
+    return ENGINE.runKernel(SearchSorted, inputs, attrs);
+}
+const searchSorted = op({ searchSorted_ });
+
+/**
+ * @license
+ * Copyright 2022 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Searches for where a value would go in a sorted sequence.
+ *
+ * This is not a method for checking containment (like javascript in).
+ *
+ * The typical use case for this operation is "binning", "bucketing", or
+ * "discretizing". The values are assigned to bucket-indices based on the edges
+ * listed in 'sortedSequence'. This operation returns the bucket-index for each
+ * value.
+ *
+ * The index returned corresponds to the first edge greater than or equal to the
+ * value.
+ *
+ * The axis is not settable for this operation. It always operates on the
+ * innermost dimension (axis=-1). The operation will accept any number of outer
+ * dimensions.
+ *
+ * Note: This operation assumes that 'lowerBound' is sorted along the
+ * innermost axis, maybe using 'sort(..., axis=-1)'. If the sequence is not
+ * sorted no error is raised and the content of the returned tensor is not well
+ * defined.
+ *
+ * ```js
+ * const edges = tf.tensor1d([-1, 3.3, 9.1, 10.0]);
+ * let values = tf.tensor1d([0.0, 4.1, 12.0]);
+ * const result1 = tf.lowerBound(edges, values);
+ * result1.print(); // [1, 2, 4]
+ *
+ * const seq = tf.tensor1d([0, 3, 9, 10, 10]);
+ * values = tf.tensor1d([0, 4, 10]);
+ * const result2 = tf.lowerBound(seq, values);
+ * result2.print(); // [0, 2, 3]
+ *
+ * const sortedSequence = tf.tensor2d([[0., 3., 8., 9., 10.],
+ *                                     [1., 2., 3., 4., 5.]]);
+ * values = tf.tensor2d([[9.8, 2.1, 4.3],
+ *                       [0.1, 6.6, 4.5, ]]);
+ * const result3 = tf.lowerBound(sortedSequence, values);
+ * result3.print(); // [[4, 1, 2], [0, 5, 4]]
+ * ```
+ * @param sortedSequence: N-D. Sorted sequence.
+ * @param values: N-D. Search values.
+ * @return An N-D int32 tensor the size of values containing the result of
+ *     applying lower bound to each value. The result is not a global index to
+ *     the entire Tensor, but the index in the last dimension.
+ * @doc {heading: 'Operations', subheading: 'Evaluation'}
+ */
+function lowerBound(sortedSequence, values) {
+    return searchSorted(sortedSequence, values, 'left');
+}
 
 /**
  * @license
@@ -18773,60 +19380,6 @@ function meshgrid(x, y, { indexing = 'xy' } = {}) {
 
 /**
  * @license
- * Copyright 2020 Google Inc. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
- * Computes the minimum value from the input.
- *
- * Reduces the input along the dimensions given in `axes`. Unless `keepDims`
- * is true, the rank of the array is reduced by 1 for each entry in `axes`.
- * If `keepDims` is true, the reduced dimensions are retained with length 1.
- * If `axes` has no entries, all dimensions are reduced, and an array with a
- * single element is returned.
- *
- * ```js
- * const x = tf.tensor1d([1, 2, 3]);
- *
- * x.min().print();  // or tf.min(x)
- * ```
- *
- * ```js
- * const x = tf.tensor2d([1, 2, 3, 4], [2, 2]);
- *
- * const axis = 1;
- * x.min(axis).print();  // or tf.min(x, axis)
- * ```
- *
- * @param x The input Tensor.
- * @param axis The dimension(s) to reduce. By default it reduces
- *     all dimensions.
- * @param keepDims If true, retains reduced dimensions with size 1.
- *
- * @doc {heading: 'Operations', subheading: 'Reduction'}
- */
-function min_(x, axis = null, keepDims = false) {
-    const $x = convertToTensor(x, 'x', 'min');
-    const inputs = { x: $x };
-    const attrs = { axis, keepDims };
-    // tslint:disable-next-line: no-unnecessary-type-assertion
-    return ENGINE.runKernel(Min, inputs, attrs);
-}
-const min = op({ min_ });
-
-/**
- * @license
  * Copyright 2020 Google LLC. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18999,41 +19552,6 @@ function mod_(a, b) {
     return ENGINE.runKernel(Mod, inputs);
 }
 const mod = op({ mod_ });
-
-/**
- * @license
- * Copyright 2019 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
- * Computes square of `x` element-wise: `x ^ 2`
- *
- * ```js
- * const x = tf.tensor1d([1, 2, Math.sqrt(2), -1]);
- *
- * x.square().print();  // or tf.square(x)
- * ```
- * @param x The input Tensor.
- *
- * @doc {heading: 'Operations', subheading: 'Basic math'}
- */
-function square_(x) {
-    const $x = convertToTensor(x, 'x', 'square');
-    const attrs = {};
-    return ENGINE.runKernel('Square', { x: $x }, attrs);
-}
-const square = op({ square_ });
 
 /**
  * @license
@@ -19575,59 +20093,6 @@ function withSpaceToBatchBasePaddings(filterShape, dilation) {
     });
 }
 const pool = op({ pool_ });
-
-/**
- * @license
- * Copyright 2020 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
- * Computes the power of one `tf.Tensor` to another. Supports broadcasting.
- *
- * Given a `tf.Tensor` x and a `tf.Tensor` y, this operation computes x^y for
- * corresponding elements in x and y. The result's dtype will be the upcasted
- * type of the `base` and `exp` dtypes.
- *
- * ```js
- * const a = tf.tensor([[2, 3], [4, 5]])
- * const b = tf.tensor([[1, 2], [3, 0]]).toInt();
- *
- * a.pow(b).print();  // or tf.pow(a, b)
- * ```
- *
- * ```js
- * const a = tf.tensor([[1, 2], [3, 4]])
- * const b = tf.tensor(2).toInt();
- *
- * a.pow(b).print();  // or tf.pow(a, b)
- * ```
- * We also expose `powStrict` which has the same signature as this op and
- * asserts that `base` and `exp` are the same shape (does not broadcast).
- *
- * @param base The base `tf.Tensor` to pow element-wise.
- * @param exp The exponent `tf.Tensor` to pow element-wise.
- *
- * @doc {heading: 'Operations', subheading: 'Arithmetic'}
- */
-function pow_(base, exp) {
-    let $base = convertToTensor(base, 'base', 'pow');
-    let $exp = convertToTensor(exp, 'exp', 'pow');
-    [$base, $exp] = makeTypesMatch($base, $exp);
-    const inputs = { a: $base, b: $exp };
-    return ENGINE.runKernel(Pow, inputs);
-}
-const pow = op({ pow_ });
 
 /**
  * @license
@@ -21457,53 +21922,6 @@ const rsqrt = op({ rsqrt_ });
 
 /**
  * @license
- * Copyright 2018 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
- * Creates rank-0 `tf.Tensor` (scalar) with the provided value and dtype.
- *
- * The same functionality can be achieved with `tf.tensor`, but in general
- * we recommend using `tf.scalar` as it makes the code more readable.
- *
- * ```js
- * tf.scalar(3.14).print();
- * ```
- *
- * @param value The value of the scalar.
- * @param dtype The data type.
- *
- * @doc {heading: 'Tensors', subheading: 'Creation'}
- */
-function scalar(value, dtype) {
-    if (((isTypedArray(value) && dtype !== 'string') || Array.isArray(value)) &&
-        dtype !== 'complex64') {
-        throw new Error('Error creating a new Scalar: value must be a primitive ' +
-            '(number|boolean|string)');
-    }
-    if (dtype === 'string' && isTypedArray(value) &&
-        !(value instanceof Uint8Array)) {
-        throw new Error('When making a scalar from encoded string, ' +
-            'the value must be `Uint8Array`.');
-    }
-    const shape = [];
-    const inferredShape = [];
-    return makeTensor(value, shape, inferredShape, dtype);
-}
-
-/**
- * @license
  * Copyright 2020 Google LLC. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22237,41 +22655,6 @@ function rfft_(input, fftLength) {
     return reshape(complex(realComplexConjugate[0], imagComplexConjugate[0]), outputShape);
 }
 const rfft = op({ rfft_ });
-
-/**
- * @license
- * Copyright 2018 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
- * Computes square root of the input `tf.Tensor` element-wise: `y = sqrt(x)`
- *
- * ```js
- * const x = tf.tensor1d([1, 2, 4, -1]);
- *
- * x.sqrt().print();  // or tf.sqrt(x)
- * ```
- * @param x The input tensor.
- *
- * @doc {heading: 'Operations', subheading: 'Basic math'}
- */
-function sqrt_(x) {
-    const $x = convertToTensor(x, 'x', 'sqrt', 'float32');
-    const inputs = { x: $x };
-    return ENGINE.runKernel(Sqrt, inputs);
-}
-const sqrt = op({ sqrt_ });
 
 /**
  * @license
@@ -23077,6 +23460,60 @@ const unstack = op({ unstack_ });
 
 /**
  * @license
+ * Copyright 2022 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Searches for where a value would go in a sorted sequence.
+ *
+ * This is not a method for checking containment (like javascript in).
+ *
+ * The typical use case for this operation is "binning", "bucketing", or
+ * "discretizing". The values are assigned to bucket-indices based on the edges
+ * listed in 'sortedSequence'. This operation returns the bucket-index for each
+ * value.
+ *
+ * The index returned corresponds to the first edge greater than the value.
+ *
+ * The axis is not settable for this operation. It always operates on the
+ * innermost dimension (axis=-1). The operation will accept any number of outer
+ * dimensions.
+ *
+ * Note: This operation assumes that 'upperBound' is sorted along the
+ * innermost axis, maybe using 'sort(..., axis=-1)'. If the sequence is not
+ * sorted no error is raised and the content of the returned tensor is not well
+ * defined.
+ *
+ * ```js
+ * const seq = tf.tensor1d([0, 3, 9, 10, 10]);
+ * const values = tf.tensor1d([0, 4, 10]);
+ * const result = tf.upperBound(seq, values);
+ * result.print(); // [1, 2, 5]
+ * ```
+ * @param sortedSequence: N-D. Sorted sequence.
+ * @param values: N-D. Search values.
+ * @return An N-D int32 tensor the size of values containing the result of
+ *     applying upper bound to each value. The result is not a global index to
+ *     the entire Tensor, but the index in the last dimension.
+ * @doc {heading: 'Operations', subheading: 'Evaluation'}
+ */
+function upperBound(sortedSequence, values) {
+    return searchSorted(sortedSequence, values, 'right');
+}
+
+/**
+ * @license
  * Copyright 2018 Google LLC. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23258,117 +23695,6 @@ async function booleanMaskAsync_(tensor, mask, axis) {
     return res;
 }
 const booleanMaskAsync = booleanMaskAsync_;
-
-/**
- * @license
- * Copyright 2018 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
- * Computes the norm of scalar, vectors, and matrices.
- * This function can compute several different vector norms (the 1-norm, the
- * Euclidean or 2-norm, the inf-norm, and in general the p-norm for p > 0)
- * and matrix norms (Frobenius, 1-norm, and inf-norm).
- *
- * ```js
- * const x = tf.tensor1d([1, 2, 3, 4]);
- *
- * x.norm().print();  // or tf.norm(x)
- * ```
- *
- * @param x The input array.
- * @param ord Optional. Order of the norm. Supported norm types are
- * following:
- *
- *  | ord        | norm for matrices         | norm for vectors
- *  |------------|---------------------------|---------------------
- *  |'euclidean' |Frobenius norm             |2-norm
- *  |'fro'       |Frobenius norm	           |
- *  |Infinity    |max(sum(abs(x), axis=1))   |max(abs(x))
- *  |-Infinity   |min(sum(abs(x), axis=1))   |min(abs(x))
- *  |1           |max(sum(abs(x), axis=0))   |sum(abs(x))
- *  |2           |                           |sum(abs(x)^2)^1/2*
- *
- * @param axis Optional. If axis is null (the default), the input is
- * considered a vector and a single vector norm is computed over the entire
- * set of values in the Tensor, i.e. norm(x, ord) is equivalent
- * to norm(x.reshape([-1]), ord). If axis is a integer, the input
- * is considered a batch of vectors, and axis determines the axis in x
- * over which to compute vector norms. If axis is a 2-tuple of integer it is
- * considered a batch of matrices and axis determines the axes in NDArray
- * over which to compute a matrix norm.
- * @param keepDims Optional. If true, the norm have the same dimensionality
- * as the input.
- *
- * @doc {heading: 'Operations', subheading: 'Matrices'}
- */
-function norm_(x, ord = 'euclidean', axis = null, keepDims = false) {
-    x = convertToTensor(x, 'x', 'norm');
-    const norm = normImpl(x, ord, axis);
-    let keepDimsShape = norm.shape;
-    if (keepDims) {
-        const axes = parseAxisParam(axis, x.shape);
-        keepDimsShape = expandShapeToKeepDim(norm.shape, axes);
-    }
-    return reshape(norm, keepDimsShape);
-}
-function normImpl(x, p, axis = null) {
-    if (x.rank === 0) {
-        return abs(x);
-    }
-    // consider vector when no axis is specified
-    if (x.rank !== 1 && axis === null) {
-        return normImpl(reshape(x, [-1]), p, axis);
-    }
-    // vector
-    if (x.rank === 1 || typeof axis === 'number' ||
-        Array.isArray(axis) && axis.length === 1) {
-        if (p === 1) {
-            return sum(abs(x), axis);
-        }
-        if (p === Infinity) {
-            return max(abs(x), axis);
-        }
-        if (p === -Infinity) {
-            return min(abs(x), axis);
-        }
-        if (p === 'euclidean' || p === 2) {
-            // norm(x, 2) = sum(abs(xi) ^ 2) ^ 1/2
-            return sqrt(sum(pow(abs(x), scalar(2, 'int32')), axis));
-        }
-        throw new Error(`Error in norm: invalid ord value: ${p}`);
-    }
-    // matrix (assumption axis[0] < axis[1])
-    if (Array.isArray(axis) && axis.length === 2) {
-        if (p === 1) {
-            return max(sum(abs(x), axis[0]), axis[1] - 1);
-        }
-        if (p === Infinity) {
-            return max(sum(abs(x), axis[1]), axis[0]);
-        }
-        if (p === -Infinity) {
-            return min(sum(abs(x), axis[1]), axis[0]);
-        }
-        if (p === 'fro' || p === 'euclidean') {
-            // norm(x) = sqrt(sum(pow(x, 2)))
-            return sqrt(sum(square(x), axis));
-        }
-        throw new Error(`Error in norm: invalid ord value: ${p}`);
-    }
-    throw new Error(`Error in norm: invalid axis: ${axis}`);
-}
-const norm = op({ norm_ });
 
 /**
  * @license
@@ -23573,7 +23899,7 @@ function validateInput(sparseIndices, sparseValues, outputShape, defaultValues) 
  */
 function sparseToDense_(sparseIndices, sparseValues, outputShape, defaultValue = 0) {
     const $sparseIndices = convertToTensor(sparseIndices, 'sparseIndices', 'sparseToDense', 'int32');
-    const $sparseValues = convertToTensor(sparseValues, 'sparseValues', 'sparseToDense');
+    const $sparseValues = convertToTensor(sparseValues, 'sparseValues', 'sparseToDense', 'string_or_numeric');
     const $defaultValue = convertToTensor(defaultValue, 'defaultValue', 'sparseToDense', $sparseValues.dtype);
     validateInput($sparseIndices, $sparseValues, outputShape, $defaultValue);
     const inputs = {
@@ -24091,7 +24417,20 @@ function fusedConv2d_({ x, filter, strides, pad, dataFormat = 'NHWC', dilations 
     if (bias != null) {
         $bias = convertToTensor(bias, 'bias', 'fused conv2d');
         [$bias] = makeTypesMatch($bias, $x);
-        assertAndGetBroadcastShape(convInfo.outShape, $bias.shape);
+        // According to TensorFlow, the bias is supposed be a 1-D tensor or a
+        // scalar.
+        if (dataFormat === 'NHWC') {
+            assertAndGetBroadcastShape(convInfo.outShape, $bias.shape);
+        }
+        else {
+            assert($bias.shape.length <= 1, () => `Error in fused conv2d: only supports scalar or 1-D Tensor ` +
+                `bias for NCHW format but got the bias of ` +
+                `rank-${$bias.shape.length}.`);
+            assert($bias.shape.length === 0 || $bias.shape[0] === convInfo.outChannels ||
+                $bias.shape[0] === 1, () => `Error in fused conv2d: bias shape (${$bias.shape}) is not ` +
+                `compatible with the number of output channels ` +
+                `(${convInfo.outChannels})`);
+        }
     }
     let $preluActivationWeights;
     if (preluActivationWeights != null) {
@@ -29485,6 +29824,7 @@ var dist$1 = /*#__PURE__*/Object.freeze({
 	conv3dTranspose: conv3dTranspose,
 	cos: cos,
 	cosh: cosh,
+	cumprod: cumprod,
 	cumsum: cumsum,
 	denseBincount: denseBincount,
 	depthToSpace: depthToSpace,
@@ -29498,6 +29838,7 @@ var dist$1 = /*#__PURE__*/Object.freeze({
 	elu: elu,
 	equal: equal,
 	erf: erf,
+	euclideanNorm: euclideanNorm,
 	exp: exp,
 	expandDims: expandDims,
 	expm1: expm1,
@@ -29526,6 +29867,7 @@ var dist$1 = /*#__PURE__*/Object.freeze({
 	logicalNot: logicalNot,
 	logicalOr: logicalOr,
 	logicalXor: logicalXor,
+	lowerBound: lowerBound,
 	matMul: matMul$1,
 	max: max,
 	maxPool: maxPool,
@@ -29620,6 +29962,7 @@ var dist$1 = /*#__PURE__*/Object.freeze({
 	unique: unique,
 	unsortedSegmentSum: unsortedSegmentSum,
 	unstack: unstack,
+	upperBound: upperBound,
 	variable: variable,
 	where: where,
 	whereAsync: whereAsync,
@@ -29632,6 +29975,7 @@ var dist$1 = /*#__PURE__*/Object.freeze({
 	norm: norm,
 	movingAverage: movingAverage,
 	scatterND: scatterND,
+	searchSorted: searchSorted,
 	sparseToDense: sparseToDense,
 	gatherND: gatherND,
 	dropout: dropout,
@@ -29713,6 +30057,7 @@ var dist$1 = /*#__PURE__*/Object.freeze({
 	Conv3DBackpropInputV2: Conv3DBackpropInputV2,
 	Cos: Cos,
 	Cosh: Cosh,
+	Cumprod: Cumprod,
 	Cumsum: Cumsum,
 	CropAndResize: CropAndResize,
 	DenseBincount: DenseBincount,
@@ -29759,6 +30104,7 @@ var dist$1 = /*#__PURE__*/Object.freeze({
 	LogicalNot: LogicalNot,
 	LogicalOr: LogicalOr,
 	LogSoftmax: LogSoftmax,
+	LowerBound: LowerBound,
 	LRN: LRN,
 	LRNGrad: LRNGrad,
 	Max: Max,
@@ -29802,6 +30148,7 @@ var dist$1 = /*#__PURE__*/Object.freeze({
 	Round: Round,
 	Rsqrt: Rsqrt,
 	ScatterNd: ScatterNd,
+	SearchSorted: SearchSorted,
 	Select: Select,
 	Selu: Selu,
 	Slice: Slice,
@@ -29836,6 +30183,7 @@ var dist$1 = /*#__PURE__*/Object.freeze({
 	Unique: Unique,
 	Unpack: Unpack,
 	UnsortedSegmentSum: UnsortedSegmentSum,
+	UpperBound: UpperBound,
 	ZerosLike: ZerosLike,
 	Step: Step,
 	FromPixels: FromPixels,
@@ -32249,6 +32597,29 @@ const json$g = [
         ]
     },
     {
+        'tfOpName': 'TensorListConcatV2',
+        'category': 'control',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'tensorListId',
+                'type': 'tensor'
+            }
+        ],
+        'attrs': [
+            {
+                'tfName': 'element_shape',
+                'name': 'elementShape',
+                'type': 'shape'
+            },
+            {
+                'tfName': 'element_dtype',
+                'name': 'elementDType',
+                'type': 'dtype'
+            }
+        ]
+    },
+    {
         'tfOpName': 'TensorListPopBack',
         'category': 'control',
         'inputs': [
@@ -32291,6 +32662,33 @@ const json$g = [
                 'tfName': 'element_dtype',
                 'name': 'elementDType',
                 'type': 'dtype'
+            }
+        ]
+    },
+    {
+        'tfOpName': 'TensorListLength',
+        'category': 'control',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'tensorListId',
+                'type': 'tensor'
+            }
+        ]
+    },
+    {
+        'tfOpName': 'TensorListResize',
+        'category': 'control',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'tensorListId',
+                'type': 'tensor'
+            },
+            {
+                'start': 1,
+                'name': 'size',
+                'type': 'number'
             }
         ]
     }
@@ -33593,6 +33991,22 @@ var dynamic = /*#__PURE__*/Object.freeze({
  */
 const json$c = [
     {
+        'tfOpName': 'LowerBound',
+        'category': 'evaluation',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'sortedSequence',
+                'type': 'tensor'
+            },
+            {
+                'start': 1,
+                'name': 'values',
+                'type': 'tensor'
+            }
+        ]
+    },
+    {
         'tfOpName': 'TopKV2',
         'category': 'evaluation',
         'inputs': [
@@ -33612,6 +34026,22 @@ const json$c = [
                 'tfName': 'sorted',
                 'name': 'sorted',
                 'type': 'bool'
+            }
+        ]
+    },
+    {
+        'tfOpName': 'UpperBound',
+        'category': 'evaluation',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'sortedSequence',
+                'type': 'tensor'
+            },
+            {
+                'start': 1,
+                'name': 'values',
+                'type': 'tensor'
             }
         ]
     },
@@ -34231,6 +34661,44 @@ const json$9 = [
                 'type': 'number'
             }
         ]
+    },
+    {
+        'tfOpName': 'ImageProjectiveTransformV3',
+        'category': 'image',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'images',
+                'type': 'tensor'
+            },
+            {
+                'start': 1,
+                'name': 'transforms',
+                'type': 'tensor'
+            },
+            {
+                'start': 2,
+                'name': 'outputShape',
+                'type': 'number[]'
+            },
+            {
+                'start': 3,
+                'name': 'fillValue',
+                'type': 'number'
+            }
+        ],
+        'attrs': [
+            {
+                'tfName': 'interpolation',
+                'name': 'interpolation',
+                'type': 'string'
+            },
+            {
+                'tfName': 'fill_mode',
+                'name': 'fillMode',
+                'type': 'string'
+            }
+        ]
     }
 ];
 
@@ -34795,6 +35263,30 @@ var matrices = /*#__PURE__*/Object.freeze({
  */
 const json$6 = [
     {
+        'tfOpName': 'EuclideanNorm',
+        'category': 'normalization',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'x',
+                'type': 'tensor'
+            },
+            {
+                'start': 1,
+                'name': 'axis',
+                'type': 'number[]'
+            }
+        ],
+        'attrs': [
+            {
+                'tfName': 'keep_dims',
+                'name': 'keepDims',
+                'type': 'bool',
+                'defaultValue': false
+            }
+        ]
+    },
+    {
         'tfOpName': 'FusedBatchNorm',
         'category': 'normalization',
         'inputs': [
@@ -35285,6 +35777,34 @@ const json$5 = [
             {
                 'tfName': 'keep_dims',
                 'name': 'keepDims',
+                'type': 'bool'
+            }
+        ]
+    },
+    {
+        'tfOpName': 'Cumprod',
+        'category': 'reduction',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'x',
+                'type': 'tensor'
+            },
+            {
+                'start': 1,
+                'name': 'axis',
+                'type': 'number'
+            }
+        ],
+        'attrs': [
+            {
+                'tfName': 'exclusive',
+                'name': 'exclusive',
+                'type': 'bool'
+            },
+            {
+                'tfName': 'reverse',
+                'name': 'reverse',
                 'type': 'bool'
             }
         ]
@@ -36463,7 +36983,7 @@ class OperationMapper {
             op: node.op,
             category: mapper.category,
             inputNames: (node.input ||
-                []).map(input => input.startsWith('^') ? input.substr(1) : input),
+                []).map(input => input.startsWith('^') ? input.slice(1) : input),
             inputs: [],
             children: [],
             inputParams: {},
@@ -37523,7 +38043,12 @@ class TensorList {
         if (this.maxNumElements !== -1 && size > this.maxNumElements) {
             throw new Error(`TensorListResize input size ${size} is greater maxNumElement ${this.maxNumElements}.`);
         }
-        this.tensors.length = size;
+        const destTensorList = new TensorList([], this.elementShape, this.elementDtype, this.maxNumElements);
+        destTensorList.tensors.length = size;
+        for (let i = 0; i < Math.min(this.tensors.length, size); ++i) {
+            destTensorList.tensors[i] = this.tensors[i];
+        }
+        return destTensorList;
     }
     /**
      * Retrieve the element at the provided index
@@ -37939,7 +38464,8 @@ const executeOp$h = async (node, tensorMap, context) => {
             context.addTensorList(tensorList);
             return [tensorList.idTensor];
         }
-        case 'TensorListConcat': {
+        case 'TensorListConcat':
+        case 'TensorListConcatV2': {
             const concatId = getParamValue('tensorListId', node, tensorMap, context);
             const tensorList = context.getTensorList(concatId.id);
             const concatDtype = getParamValue('dtype', node, tensorMap, context);
@@ -37967,6 +38493,19 @@ const executeOp$h = async (node, tensorMap, context) => {
             const tensorList = split(splitTensor, lengths, elementShape);
             context.addTensorList(tensorList);
             return [tensorList.idTensor];
+        }
+        case 'TensorListLength': {
+            const idTensor = getParamValue('tensorListId', node, tensorMap, context);
+            const tensorList = context.getTensorList(idTensor.id);
+            return [scalar(tensorList.size(), 'int32')];
+        }
+        case 'TensorListResize': {
+            const idTensor = getParamValue('tensorListId', node, tensorMap, context);
+            const size = getParamValue('size', node, tensorMap, context);
+            const srcTensorList = context.getTensorList(idTensor.id);
+            const destTensorList = srcTensorList.resize(size);
+            context.addTensorList(destTensorList);
+            return [destTensorList.idTensor];
         }
         default:
             throw TypeError(`Node type ${node.op} is not implemented`);
@@ -38312,12 +38851,22 @@ const executeOp$e = async (node, tensorMap, context) => {
  */
 const executeOp$d = (node, tensorMap, context) => {
     switch (node.op) {
+        case 'LowerBound': {
+            const sortedSequence = getParamValue('sortedSequence', node, tensorMap, context);
+            const values = getParamValue('values', node, tensorMap, context);
+            return [lowerBound(sortedSequence, values)];
+        }
         case 'TopKV2': {
             const x = getParamValue('x', node, tensorMap, context);
             const k = getParamValue('k', node, tensorMap, context);
             const sorted = getParamValue('sorted', node, tensorMap, context);
             const result = topk(x, k, sorted);
             return [result.values, result.indices];
+        }
+        case 'UpperBound': {
+            const sortedSequence = getParamValue('sortedSequence', node, tensorMap, context);
+            const values = getParamValue('values', node, tensorMap, context);
+            return [upperBound(sortedSequence, values)];
         }
         case 'Unique': {
             const x = getParamValue('x', node, tensorMap, context);
@@ -38627,6 +39176,15 @@ const executeOp$a = (node, tensorMap, context) => {
             const extrapolationValue = getParamValue('extrapolationValue', node, tensorMap, context);
             return [image$1.cropAndResize(image, boxes, boxInd, cropSize, method, extrapolationValue)];
         }
+        case 'ImageProjectiveTransformV3': {
+            const images = getParamValue('images', node, tensorMap, context);
+            const transforms = getParamValue('transforms', node, tensorMap, context);
+            const outputShape = getParamValue('outputShape', node, tensorMap, context);
+            const fillValue = getParamValue('fillValue', node, tensorMap, context);
+            const interpolation = getParamValue('interpolation', node, tensorMap, context);
+            const fillMode = getParamValue('fillMode', node, tensorMap, context);
+            return [image$1.transform(images, transforms, interpolation.toLowerCase(), fillMode.toLowerCase(), fillValue, outputShape)];
+        }
         default:
             throw TypeError(`Node type ${node.op} is not implemented`);
     }
@@ -38761,6 +39319,8 @@ const executeOp$8 = (node, tensorMap, context) => {
  */
 const executeOp$7 = (node, tensorMap, context) => {
     switch (node.op) {
+        case 'EuclideanNorm':
+            return [euclideanNorm(getParamValue('x', node, tensorMap, context), getParamValue('axis', node, tensorMap, context), getParamValue('keepDims', node, tensorMap, context))];
         case 'FusedBatchNorm':
         case 'FusedBatchNormV2': {
             return [batchNorm(getParamValue('x', node, tensorMap, context), getParamValue('mean', node, tensorMap, context), getParamValue('variance', node, tensorMap, context), getParamValue('offset', node, tensorMap, context), getParamValue('scale', node, tensorMap, context), getParamValue('epsilon', node, tensorMap, context))];
@@ -38845,6 +39405,12 @@ const executeOp$6 = (node, tensorMap, context) => {
             const axis = getParamValue('axis', node, tensorMap, context);
             const keepDims = getParamValue('keepDims', node, tensorMap, context);
             return [prod(getParamValue('x', node, tensorMap, context), axis, keepDims)];
+        }
+        case 'Cumprod': {
+            const axis = getParamValue('axis', node, tensorMap, context);
+            const exclusive = getParamValue('exclusive', node, tensorMap, context);
+            const reverse = getParamValue('reverse', node, tensorMap, context);
+            return [cumprod(getParamValue('x', node, tensorMap, context), axis, exclusive, reverse)];
         }
         case 'Cumsum': {
             const axis = getParamValue('axis', node, tensorMap, context);
@@ -40550,7 +41116,7 @@ async function loadGraphModel(modelUrl, options = {}) {
 
 /** @license See the LICENSE file. */
 // This code is auto-generated, do not modify this file!
-const version = '3.13.0';
+const version = '3.17.0';
 
 /**
  * @license
@@ -42788,9 +43354,9 @@ __export(types);
 
 var index = /*@__PURE__*/getDefaultExportFromCjs(dist$2);
 
-var index$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/_mergeNamespaces({
+var index$1 = /*#__PURE__*/_mergeNamespaces({
 	__proto__: null,
 	'default': index
-}, [dist$2]));
+}, [dist$2]);
 
 export { index$1 as handpose };

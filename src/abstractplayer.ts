@@ -5,12 +5,19 @@ export interface Bounds {
     height: number;
 }
 
-export abstract class AbstractPlayer {
-    abstract loop: boolean;
+export abstract class AbstractPlayerState {
+    abstract isLooping: boolean;
+
+    abstract isPlaying: boolean;
+
+    abstract currentTime: number;
+
+    abstract duration: number;
+}
+
+export abstract class AbstractPlayer extends AbstractPlayerState {
 
     abstract get videoBounds(): Bounds;
-
-    abstract get duration(): number;
 
     abstract pause(): void;
 
@@ -19,13 +26,5 @@ export abstract class AbstractPlayer {
     abstract togglePlayback(): void;
 
     abstract get naturalSize(): { width: number, height: number };
-
-    abstract get currentTime(): number;
-
-    abstract set currentTime(val);
-
-    abstract set currentPercent(val);
-
-    abstract get currentPercent(): number;
 
 }

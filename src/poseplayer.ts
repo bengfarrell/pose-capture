@@ -1,40 +1,58 @@
-import {Keyframe} from "./videopose-element";
-import {AbstractPlayer, Bounds} from "./abstractplayer";
-import {Events} from "./events";
+import { Keyframe } from './videopose-element';
+import {AbstractPlayer, AbstractPlayerState, Bounds} from './abstractplayer';
+import { Events } from './events';
+import { AbstractPoseVisualizer } from './abstractvisualizer';
+import { PlaybackEvent } from './playbackevent';
 
 export default class PosePlayer extends HTMLElement implements AbstractPlayer {
     static get observedAttributes() {
-        return ['loop']
+        return ['isLooping', 'posedata']
     }
 
-    protected _keyframes: Keyframe[] = [];
+    protected playStartTime = 0;
 
-    protected _audio?: Blob;
+    protected currentKeyframe = 0;
 
-    /*set data(data) {
+    protected keyframes: Keyframe[] = [];
 
-    }*/
-
-    public loadPoseData(uri: string) {
-        fetch(uri)
-            .then(function(response) {
-                return response.json()
-            })
-            .then(function(_response) {
-                // let objectURL = URL.createObjectURL(response);
-                // myImage.src = objectURL;
-            });
-    }
+    protected audio?: HTMLAudioElement;
 
     /**
-     * whether to loop video playback
+     * is video looping?
      */
-    public loop: boolean = false;
+    protected _isLooping: boolean = this.hasAttribute('isLooping');
+
+    public get isLooping() {
+        return this._isLooping;
+    }
+
+    public set isLooping(val: boolean) {
+        this._isLooping = val;
+        if (this._isLooping) {
+            this.setAttribute('isLooping', '');
+        } else {
+            this.removeAttribute('isLooping');
+        }
+    }
 
     /**
      * is video playing?
      */
-    protected playing: boolean = false;
+    protected _isPlaying: boolean = false;
+
+    public get isPlaying() {
+        return this._isPlaying;
+    }
+
+    /**
+     * video duration
+     */
+    protected _duration: number = 0;
+
+    public get duration() {
+        return this._duration;
+    }
+
 
     /**
      * width of component
@@ -65,10 +83,6 @@ export default class PosePlayer extends HTMLElement implements AbstractPlayer {
         return this.visibleMediaRect;
     }
 
-    public get duration() {
-        return 0; // this.videoEl.duration;
-    }
-
     /**
      * get video element's natural size
      */
@@ -79,53 +93,190 @@ export default class PosePlayer extends HTMLElement implements AbstractPlayer {
         };
     }
 
+
+    public loadPoseData(uri: string) {
+        fetch(uri)
+            .then((response) => {
+                return response.json()
+            })
+            .then((json) => {
+                this.keyframes = json.keyframes;
+                // temporarily massage times such that we start with 0
+                const firstKeyTime = json.keyframes[0].time;
+                this.keyframes.forEach((keyframe: Keyframe) => {
+                    keyframe.time -= firstKeyTime;
+                }) ;
+
+                if (json.audio) {
+                    this.audio = new Audio(json.audio);
+                }
+
+                this._duration = this.keyframes[this.keyframes.length - 1].time;
+                this.updateControls();
+
+                if (this.hasAttribute('autoplay')) {
+                    this.play();
+                } else {
+                    this.renderPose();
+                }
+            }).catch(function() {
+            console.warn(`Error, ${uri} cannot be found`);
+        });
+    }
+
     constructor() {
         super();
         this.attachShadow( { mode: 'open' } );
 
         if (this.shadowRoot) {
             this.shadowRoot.innerHTML = `
+            <style>
+                :host {
+                    display: inline-block;
+                    overflow: hidden;
+                    position: relative;
+                }
+                
+                ::slotted(*) {
+                    position: absolute;
+                    width: 100%;
+                }
+            </style>
             <slot></slot>`;
         }
 
-        this.playing = false;
+        if (this.hasAttribute('posedata')) {
+            this.loadPoseData(this.getAttribute('posedata') as string);
+        }
+
+        this.addEventListener(PlaybackEvent.Type, this.handleControlsEvent as any);
+
+        this._isPlaying = false;
     }
 
-    public pause() {
-    }
+    protected handleControlsEvent(e: PlaybackEvent) {
+        switch (e.action) {
+            case PlaybackEvent.TOGGLE_PLAYBACK:
+                if (this.isPlaying) {
+                    this.pause();
+                } else {
+                    this.play();
+                }
+                this.updateControls();
+                break;
 
-    public play() {
-    }
+            case PlaybackEvent.LOOP:
+                this.isLooping = !e.state.isLooping;
+                this.updateControls();
+                break;
 
-    public togglePlayback() {
-        if (this.playing) {
-            // this.videoEl.pause();
-        } else {
-            // this.videoEl.play();
+            case PlaybackEvent.TIMELINE_SCRUB:
+                this.pause();
+                this.currentTime = e.state.currentTime;
+                break;
         }
     }
 
+    protected updateControls() {
+        const slot = this.shadowRoot?.querySelector('slot');
+        if (slot) {
+            slot.assignedElements().forEach( (slotted: any) => {
+                const controls: AbstractPlayerState = slotted;
+                if (controls) {
+                    controls.isLooping = this.isLooping;
+                    controls.isPlaying = this.isPlaying;
+                    controls.currentTime = this.currentTime;
+                    controls.duration = this.duration;
+                }
+            });
+        }
+    }
+
+    public togglePlayback() {
+        if (this.isPlaying) {
+            this.pause();
+        } else {
+            this.play();
+        }
+    }
+
+    public pause() {
+        this.audio?.pause();
+        this._isPlaying = false;
+    }
+
+    public play() {
+        this._isPlaying = true;
+        this.playStartTime = Date.now();
+
+        // this.audio?.play();
+
+        if (this.audio) {
+            this.audio.loop = this.isLooping;
+        }
+        this.renderFrame();
+    }
+
+    protected renderFrame() {
+        if (this.keyframes.length === 0) {
+            return;
+        }
+        if (this.currentKeyframe >= this.keyframes.length - 1) {
+            if (this.isLooping) {
+                this.currentKeyframe = 0;
+                this.playStartTime = Date.now();
+                this.renderPose();
+            } else {
+                this._isPlaying = false;
+                return;
+            }
+        }
+        this._currentTime = Date.now() - this.playStartTime;
+        const next: Keyframe = this.keyframes[this.currentKeyframe + 1];
+        if (this.currentTime > next.time) {
+            this.currentKeyframe ++;
+            this.renderPose();
+        }
+
+        this.updateControls();
+
+        if (this.isPlaying) {
+            requestAnimationFrame(() => {
+                this.renderFrame();
+            });
+        }
+    }
+
+    protected renderPose() {
+        const slot = this.shadowRoot?.querySelector('slot');
+        if (slot) {
+            slot.assignedElements().forEach( (slotted: any) => {
+                if (slotted.draw) {
+                    const viz: AbstractPoseVisualizer = slotted as unknown as AbstractPoseVisualizer;
+                    viz.draw([ this.keyframes[this.currentKeyframe] ], this.getBoundingClientRect());
+                }
+            });
+        }
+    }
+
+    protected _currentTime = 0;
+
     public get currentTime() {
-        return 0;
+        return this._currentTime;
     }
 
-    public set currentTime(_val) {
-        // this.videoEl.currentTime = val;
-        // this.dispatchEvent(new Event(Events.TIME_UPDATE, { bubbles: true, composed: true }));
-    }
-
-    /**
-     * set current time based on percentage through video
-     */
-    public set currentPercent(val) {
-        this.currentTime = (val / 100) * this.duration;
-    }
-
-    /**
-     * get current time based on percentage through video
-     */
-    public get currentPercent() {
-        return (this.currentTime / this.duration) * 100;
+    public set currentTime(val) {
+        this._currentTime = val;
+        if (this.audio) {
+            this.audio.currentTime = val;
+        }
+        for (let c = 0; c < this.keyframes.length; c++) {
+            if (this.keyframes[c].time > this.currentTime) {
+                this.currentKeyframe = c;
+                this.renderPose();
+                break;
+            }
+        }
     }
 
     protected onEnded() {
@@ -135,8 +286,11 @@ export default class PosePlayer extends HTMLElement implements AbstractPlayer {
 
     protected attributeChangedCallback(name: string, _oldval: string, newval: string ) {
         switch (name) {
-            case 'loop':
-                this.loop = this.hasAttribute('loop');
+            case 'isLooping':
+                this._isLooping = this.hasAttribute('isLooping');
+                if (this.audio) {
+                    this.audio.loop = this.isLooping;
+                }
                 break;
 
             case 'source':

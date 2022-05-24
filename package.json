@@ -3,21 +3,22 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "@mediapipe/drawing_utils": "^0.3.1620248257"
+    "@mediapipe/drawing_utils": "^0.3.1620248257",
+    "lit": "^2.2.4"
   },
   "devDependencies": {
     "@11ty/eleventy": "^1.0.0",
     "@11ty/eleventy-plugin-syntaxhighlight": "^4.0.0",
-    "@mediapipe/pose": "~0.5.1635988162",
+    "@mediapipe/hands": "^0.4.1635986972",
+    "@mediapipe/pose": "0.4.1633558788",
     "@rollup/plugin-alias": "^3.1.9",
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@rollup/plugin-replace": "^2.3.3",
     "@tensorflow-models/body-pix": "^2.2.0",
     "@tensorflow-models/face-landmarks-detection": "0.0.3",
-    "@tensorflow-models/pose-detection": "0.0.6",
-    "@mediapipe/hands": "^0.4.1635986972",
     "@tensorflow-models/hand-pose-detection": "^0.0.1",
+    "@tensorflow-models/pose-detection": "0.0.6",
     "@tensorflow/tfjs-backend-webgl": "^3.13.0",
     "@tensorflow/tfjs-converter": "^3.13.0",
     "@tensorflow/tfjs-core": "^3.13.0",

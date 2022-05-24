@@ -471,7 +471,7 @@ class Environment {
         if (this.platform != null) {
             if (!(env$1().getBool('IS_TEST') || env$1().getBool('PROD'))) {
                 console.warn(`Platform ${this.platformName} has already been set. ` +
-                    `Overwriting the platform with ${platform}.`);
+                    `Overwriting the platform with ${platformName}.`);
             }
         }
         this.platformName = platformName;
@@ -929,6 +929,7 @@ const Conv2DBackpropInput = 'Conv2DBackpropInput';
 const Conv3D = 'Conv3D';
 const Cos = 'Cos';
 const Cosh = 'Cosh';
+const Cumprod = 'Cumprod';
 const Cumsum = 'Cumsum';
 const CropAndResize = 'CropAndResize';
 const DenseBincount = 'DenseBincount';
@@ -1005,6 +1006,7 @@ const Reverse = 'Reverse';
 const Round = 'Round';
 const Rsqrt = 'Rsqrt';
 const ScatterNd = 'ScatterNd';
+const SearchSorted = 'SearchSorted';
 const Select = 'Select';
 const Selu = 'Selu';
 const Slice = 'Slice';
@@ -2662,8 +2664,7 @@ class Engine {
                     if (outInfo.rank != null) {
                         return outInfo;
                     }
-                    const { dataId, shape, dtype } = outInfo;
-                    return this.makeTensorFromDataId(dataId, shape, dtype);
+                    return this.makeTensorFromTensorInfo(outInfo);
                 });
                 // Save any required inputs and outputs.
                 // Do not save unless we are recording to the tape. Otherwise it would
@@ -2809,12 +2810,12 @@ class Engine {
         return t;
     }
     /**
-     * Internal method used by backends. Makes a new tensor
-     * that is a wrapper around an existing data id. It doesn't create
-     * a new data id, only increments the ref count used in memory tracking.
+     * Internal method used by backends. Makes a new tensor that is a wrapper
+     * around an existing data id in TensorInfo. It doesn't create a new data id,
+     * only increments the ref count used in memory tracking.
      */
-    makeTensorFromDataId(dataId, shape, dtype, backend) {
-        dtype = dtype || 'float32';
+    makeTensorFromTensorInfo(tensorInfo, backend) {
+        const { dataId, shape, dtype } = tensorInfo;
         const t = new Tensor(shape, dtype, dataId, this.nextTensorId());
         this.trackTensor(t, backend);
         return t;
@@ -3258,6 +3259,8 @@ ENV$1.registerFlag('IS_TEST', () => false);
 ENV$1.registerFlag('CHECK_COMPUTATION_FOR_ERRORS', () => true);
 /** Whether the backend needs to wrap input to imageBitmap. */
 ENV$1.registerFlag('WRAP_TO_IMAGEBITMAP', () => false);
+/** Experimental flag, whether enter compile only phase. */
+ENV$1.registerFlag('ENGINE_COMPILE_ONLY', () => false);
 
 var lookup = [];
 var revLookup = [];
@@ -3496,6 +3499,11 @@ var INSPECT_MAX_BYTES = 50;
 Buffer.TYPED_ARRAY_SUPPORT = global$1.TYPED_ARRAY_SUPPORT !== undefined
   ? global$1.TYPED_ARRAY_SUPPORT
   : true;
+
+/*
+ * Export kMaxLength after typed array support is determined.
+ */
+kMaxLength();
 
 function kMaxLength () {
   return Buffer.TYPED_ARRAY_SUPPORT
@@ -6763,7 +6771,7 @@ class PlatformNode {
         return new this.util.TextDecoder(encoding).decode(bytes);
     }
 }
-if (env$1().get('IS_NODE')) {
+if (env$1().get('IS_NODE') && !env$1().get('IS_BROWSER')) {
     env$1().setPlatform('node', new PlatformNode());
 }
 
@@ -7405,12 +7413,16 @@ const matMul$1 = op({ matMul_ });
  * value `onValue` (defaults to 1), while all other locations take value
  * `offValue` (defaults to 0). If `indices` is rank `R`, the output has rank
  * `R+1` with the last axis of size `depth`.
+ * `indices` used to encode prediction class must start from 0. For example,
+ *  if you have 3 classes of data, class 1 should be encoded as 0, class 2
+ *  should be 1, and class 3 should be 2.
  *
  * ```js
  * tf.oneHot(tf.tensor1d([0, 1], 'int32'), 3).print();
  * ```
  *
- * @param indices `tf.Tensor` of indices with dtype `int32`.
+ * @param indices `tf.Tensor` of indices with dtype `int32`. Indices must
+ * start from 0.
  * @param depth The depth of the one hot dimension.
  * @param onValue A number used to fill in the output when the index matches
  * the location.
@@ -10143,6 +10155,53 @@ const cosh = op({ cosh_ });
 
 /**
  * @license
+ * Copyright 2022 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the 'License');
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an 'AS IS' BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes the cumulative product of a `tf.Tensor` along `axis`.
+ *
+ * ```js
+ * const x = tf.tensor([1, 2, 3, 4]);
+ * x.cumprod().print();
+ * ```
+ * ```js
+ * const x = tf.tensor([[1, 2], [3, 4]]);
+ * x.cumprod().print();
+ * ```
+ *
+ * @param x The input tensor to cumulatively multiply.
+ * @param axis The axis along which to multiply. Optional. Defaults to 0.
+ * @param exclusive Whether to perform exclusive cumulative product. Optional.
+ *     Defaults to false. If set to true then the product of each tensor entry
+ *     does not include its own value, but only the values previous to it
+ *     along the specified axis.
+ * @param reverse Whether to multiply in the opposite direction. Optional.
+ *     Defaults to false.
+ *
+ * @doc {heading: 'Operations', subheading: 'Scan'}
+ */
+function cumprod_(x, axis = 0, exclusive = false, reverse = false) {
+    const $x = convertToTensor(x, 'x', 'cumprod');
+    const inputs = { x: $x };
+    const attrs = { axis, exclusive, reverse };
+    return ENGINE.runKernel(Cumprod, inputs, attrs);
+}
+const cumprod = op({ cumprod_ });
+
+/**
+ * @license
  * Copyright 2018 Google LLC. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -10841,6 +10900,531 @@ function erf_(x) {
     return ENGINE.runKernel(Erf, inputs);
 }
 const erf = op({ erf_ });
+
+/**
+ * @license
+ * Copyright 2017 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+function combineLocations(outputLoc, reduceLoc, axes) {
+    const rank = outputLoc.length + reduceLoc.length;
+    const loc = [];
+    let outIdx = 0;
+    let reduceIdx = 0;
+    for (let dim = 0; dim < rank; dim++) {
+        if (axes.indexOf(dim) === -1) {
+            loc.push(outputLoc[outIdx++]);
+        }
+        else {
+            loc.push(reduceLoc[reduceIdx++]);
+        }
+    }
+    return loc;
+}
+function expandShapeToKeepDim(shape, axes) {
+    const reduceSubShape = axes.map(x => 1);
+    return combineLocations(shape, reduceSubShape, axes);
+}
+
+/**
+ * @license
+ * Copyright 2020 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes the maximum of elements across dimensions of a `tf.Tensor`.
+ *
+ * Reduces the input along the dimensions given in `axes`. Unless `keepDims`
+ * is true, the rank of the `tf.Tensor` is reduced by 1 for each entry in
+ * `axes`. If `keepDims` is true, the reduced dimensions are retained with
+ * length 1. If `axes` has no entries, all dimensions are reduced, and an
+ * `tf.Tensor` with a single element is returned.
+ *
+ * ```js
+ * const x = tf.tensor1d([1, 2, 3]);
+ *
+ * x.max().print();  // or tf.max(x)
+ * ```
+ *
+ * ```js
+ * const x = tf.tensor2d([1, 2, 3, 4], [2, 2]);
+ *
+ * const axis = 1;
+ * x.max(axis).print();  // or tf.max(x, axis)
+ * ```
+ *
+ * @param x The input tensor.
+ * @param axis The dimension(s) to reduce. By default it reduces
+ *     all dimensions.
+ * @param keepDims If true, retains reduced dimensions with size 1.
+ *
+ * @doc {heading: 'Operations', subheading: 'Reduction'}
+ */
+function max_(x, axis = null, keepDims = false) {
+    const $x = convertToTensor(x, 'x', 'max');
+    const inputs = { x: $x };
+    const attrs = { reductionIndices: axis, keepDims };
+    return ENGINE.runKernel(Max, inputs, attrs);
+}
+const max = op({ max_ });
+
+/**
+ * @license
+ * Copyright 2020 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes the minimum value from the input.
+ *
+ * Reduces the input along the dimensions given in `axes`. Unless `keepDims`
+ * is true, the rank of the array is reduced by 1 for each entry in `axes`.
+ * If `keepDims` is true, the reduced dimensions are retained with length 1.
+ * If `axes` has no entries, all dimensions are reduced, and an array with a
+ * single element is returned.
+ *
+ * ```js
+ * const x = tf.tensor1d([1, 2, 3]);
+ *
+ * x.min().print();  // or tf.min(x)
+ * ```
+ *
+ * ```js
+ * const x = tf.tensor2d([1, 2, 3, 4], [2, 2]);
+ *
+ * const axis = 1;
+ * x.min(axis).print();  // or tf.min(x, axis)
+ * ```
+ *
+ * @param x The input Tensor.
+ * @param axis The dimension(s) to reduce. By default it reduces
+ *     all dimensions.
+ * @param keepDims If true, retains reduced dimensions with size 1.
+ *
+ * @doc {heading: 'Operations', subheading: 'Reduction'}
+ */
+function min_(x, axis = null, keepDims = false) {
+    const $x = convertToTensor(x, 'x', 'min');
+    const inputs = { x: $x };
+    const attrs = { axis, keepDims };
+    // tslint:disable-next-line: no-unnecessary-type-assertion
+    return ENGINE.runKernel(Min, inputs, attrs);
+}
+const min = op({ min_ });
+
+/**
+ * @license
+ * Copyright 2020 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes the power of one `tf.Tensor` to another. Supports broadcasting.
+ *
+ * Given a `tf.Tensor` x and a `tf.Tensor` y, this operation computes x^y for
+ * corresponding elements in x and y. The result's dtype will be the upcasted
+ * type of the `base` and `exp` dtypes.
+ *
+ * ```js
+ * const a = tf.tensor([[2, 3], [4, 5]])
+ * const b = tf.tensor([[1, 2], [3, 0]]).toInt();
+ *
+ * a.pow(b).print();  // or tf.pow(a, b)
+ * ```
+ *
+ * ```js
+ * const a = tf.tensor([[1, 2], [3, 4]])
+ * const b = tf.tensor(2).toInt();
+ *
+ * a.pow(b).print();  // or tf.pow(a, b)
+ * ```
+ * We also expose `powStrict` which has the same signature as this op and
+ * asserts that `base` and `exp` are the same shape (does not broadcast).
+ *
+ * @param base The base `tf.Tensor` to pow element-wise.
+ * @param exp The exponent `tf.Tensor` to pow element-wise.
+ *
+ * @doc {heading: 'Operations', subheading: 'Arithmetic'}
+ */
+function pow_(base, exp) {
+    let $base = convertToTensor(base, 'base', 'pow');
+    let $exp = convertToTensor(exp, 'exp', 'pow');
+    [$base, $exp] = makeTypesMatch($base, $exp);
+    const inputs = { a: $base, b: $exp };
+    return ENGINE.runKernel(Pow, inputs);
+}
+const pow = op({ pow_ });
+
+/**
+ * @license
+ * Copyright 2018 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Creates rank-0 `tf.Tensor` (scalar) with the provided value and dtype.
+ *
+ * The same functionality can be achieved with `tf.tensor`, but in general
+ * we recommend using `tf.scalar` as it makes the code more readable.
+ *
+ * ```js
+ * tf.scalar(3.14).print();
+ * ```
+ *
+ * @param value The value of the scalar.
+ * @param dtype The data type.
+ *
+ * @doc {heading: 'Tensors', subheading: 'Creation'}
+ */
+function scalar(value, dtype) {
+    if (((isTypedArray(value) && dtype !== 'string') || Array.isArray(value)) &&
+        dtype !== 'complex64') {
+        throw new Error('Error creating a new Scalar: value must be a primitive ' +
+            '(number|boolean|string)');
+    }
+    if (dtype === 'string' && isTypedArray(value) &&
+        !(value instanceof Uint8Array)) {
+        throw new Error('When making a scalar from encoded string, ' +
+            'the value must be `Uint8Array`.');
+    }
+    const shape = [];
+    const inferredShape = [];
+    return makeTensor(value, shape, inferredShape, dtype);
+}
+
+/**
+ * @license
+ * Copyright 2018 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes square root of the input `tf.Tensor` element-wise: `y = sqrt(x)`
+ *
+ * ```js
+ * const x = tf.tensor1d([1, 2, 4, -1]);
+ *
+ * x.sqrt().print();  // or tf.sqrt(x)
+ * ```
+ * @param x The input tensor.
+ *
+ * @doc {heading: 'Operations', subheading: 'Basic math'}
+ */
+function sqrt_(x) {
+    const $x = convertToTensor(x, 'x', 'sqrt', 'float32');
+    const inputs = { x: $x };
+    return ENGINE.runKernel(Sqrt, inputs);
+}
+const sqrt = op({ sqrt_ });
+
+/**
+ * @license
+ * Copyright 2019 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes square of `x` element-wise: `x ^ 2`
+ *
+ * ```js
+ * const x = tf.tensor1d([1, 2, Math.sqrt(2), -1]);
+ *
+ * x.square().print();  // or tf.square(x)
+ * ```
+ * @param x The input Tensor.
+ *
+ * @doc {heading: 'Operations', subheading: 'Basic math'}
+ */
+function square_(x) {
+    const $x = convertToTensor(x, 'x', 'square');
+    const attrs = {};
+    return ENGINE.runKernel('Square', { x: $x }, attrs);
+}
+const square = op({ square_ });
+
+/**
+ * @license
+ * Copyright 2018 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes the sum of elements across dimensions of a `tf.Tensor`.
+ *
+ * Reduces the input along the dimensions given in `axes`. Unless `keepDims`
+ * is true, the rank of the `tf.Tensor` is reduced by 1 for each entry in
+ * `axes`. If `keepDims` is true, the reduced dimensions are retained with
+ * length 1. If axes has no entries, all dimensions are reduced, and a
+ * `tf.Tensor` with a single element is returned.
+ *
+ * ```js
+ * const x = tf.tensor1d([1, 2, 3]);
+ *
+ * x.sum().print();  // or tf.sum(x)
+ * ```
+ *
+ * ```js
+ * const x = tf.tensor2d([1, 2, 3, 4], [2, 2]);
+ *
+ * const axis = 1;
+ * x.sum(axis).print();  // or tf.sum(x, axis)
+ * ```
+ *
+ * @param x The input tensor to compute the sum over. If the dtype is `bool`
+ *   it will be converted to `int32` and the output dtype will be `int32`.
+ * @param axis The dimension(s) to reduce. By default it reduces
+ *     all dimensions.
+ * @param keepDims If true, retains reduced dimensions with size 1.
+ *
+ * @doc {heading: 'Operations', subheading: 'Reduction'}
+ */
+function sum_(x, axis = null, keepDims = false) {
+    let $x = convertToTensor(x, 'x', 'sum');
+    if ($x.dtype === 'bool') {
+        $x = cast($x, 'int32');
+    }
+    const inputs = { x: $x };
+    const attrs = { axis, keepDims };
+    return ENGINE.runKernel(Sum, inputs, attrs);
+}
+const sum = op({ sum_ });
+
+/**
+ * @license
+ * Copyright 2018 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes the norm of scalar, vectors, and matrices.
+ * This function can compute several different vector norms (the 1-norm, the
+ * Euclidean or 2-norm, the inf-norm, and in general the p-norm for p > 0)
+ * and matrix norms (Frobenius, 1-norm, and inf-norm).
+ *
+ * ```js
+ * const x = tf.tensor1d([1, 2, 3, 4]);
+ *
+ * x.norm().print();  // or tf.norm(x)
+ * ```
+ *
+ * @param x The input array.
+ * @param ord Optional. Order of the norm. Supported norm types are
+ * following:
+ *
+ *  | ord        | norm for matrices         | norm for vectors
+ *  |------------|---------------------------|---------------------
+ *  |'euclidean' |Frobenius norm             |2-norm
+ *  |'fro'       |Frobenius norm	           |
+ *  |Infinity    |max(sum(abs(x), axis=1))   |max(abs(x))
+ *  |-Infinity   |min(sum(abs(x), axis=1))   |min(abs(x))
+ *  |1           |max(sum(abs(x), axis=0))   |sum(abs(x))
+ *  |2           |                           |sum(abs(x)^2)^1/2*
+ *
+ * @param axis Optional. If axis is null (the default), the input is
+ * considered a vector and a single vector norm is computed over the entire
+ * set of values in the Tensor, i.e. norm(x, ord) is equivalent
+ * to norm(x.reshape([-1]), ord). If axis is a integer, the input
+ * is considered a batch of vectors, and axis determines the axis in x
+ * over which to compute vector norms. If axis is a 2-tuple of integer it is
+ * considered a batch of matrices and axis determines the axes in NDArray
+ * over which to compute a matrix norm.
+ * @param keepDims Optional. If true, the norm have the same dimensionality
+ * as the input.
+ *
+ * @doc {heading: 'Operations', subheading: 'Matrices'}
+ */
+function norm_(x, ord = 'euclidean', axis = null, keepDims = false) {
+    x = convertToTensor(x, 'x', 'norm');
+    const norm = normImpl(x, ord, axis);
+    let keepDimsShape = norm.shape;
+    if (keepDims) {
+        const axes = parseAxisParam(axis, x.shape);
+        keepDimsShape = expandShapeToKeepDim(norm.shape, axes);
+    }
+    return reshape(norm, keepDimsShape);
+}
+function normImpl(x, p, axis = null) {
+    if (x.rank === 0) {
+        return abs(x);
+    }
+    // consider vector when no axis is specified
+    if (x.rank !== 1 && axis === null) {
+        return normImpl(reshape(x, [-1]), p, axis);
+    }
+    // vector
+    if (x.rank === 1 || typeof axis === 'number' ||
+        Array.isArray(axis) && axis.length === 1) {
+        if (p === 1) {
+            return sum(abs(x), axis);
+        }
+        if (p === Infinity) {
+            return max(abs(x), axis);
+        }
+        if (p === -Infinity) {
+            return min(abs(x), axis);
+        }
+        if (p === 'euclidean' || p === 2) {
+            // norm(x, 2) = sum(abs(xi) ^ 2) ^ 1/2
+            return sqrt(sum(pow(abs(x), scalar(2, 'int32')), axis));
+        }
+        throw new Error(`Error in norm: invalid ord value: ${p}`);
+    }
+    // matrix (assumption axis[0] < axis[1])
+    if (Array.isArray(axis) && axis.length === 2) {
+        if (p === 1) {
+            return max(sum(abs(x), axis[0]), axis[1] - 1);
+        }
+        if (p === Infinity) {
+            return max(sum(abs(x), axis[1]), axis[0]);
+        }
+        if (p === -Infinity) {
+            return min(sum(abs(x), axis[1]), axis[0]);
+        }
+        if (p === 'fro' || p === 'euclidean') {
+            // norm(x) = sqrt(sum(pow(x, 2)))
+            return sqrt(sum(square(x), axis));
+        }
+        throw new Error(`Error in norm: invalid ord value: ${p}`);
+    }
+    throw new Error(`Error in norm: invalid axis: ${axis}`);
+}
+const norm = op({ norm_ });
+
+/**
+ * @license
+ * Copyright 2022 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Computes the euclidean norm of scalar, vectors, and matrices.
+ *
+ * ```js
+ * const x = tf.tensor1d([1, 2, 3, 4]);
+ *
+ * x.euclideanNorm().print();  // or tf.euclideanNorm(x)
+ * ```
+ *
+ * @param x The input array.
+ * @param axis Optional. If axis is null (the default), the input is
+ * considered a vector and a single vector norm is computed over the entire
+ * set of values in the Tensor, i.e. euclideanNorm(x) is equivalent
+ * to euclideanNorm(x.reshape([-1])). If axis is a integer, the input
+ * is considered a batch of vectors, and axis determines the axis in x
+ * over which to compute vector norms. If axis is a 2-tuple of integer it is
+ * considered a batch of matrices and axis determines the axes in NDArray
+ * over which to compute a matrix norm.
+ * @param keepDims Optional. If true, the norm have the same dimensionality
+ * as the input.
+ *
+ * @doc {heading: 'Operations', subheading: 'Matrices'}
+ */
+function euclideanNorm_(x, axis = null, keepDims = false) {
+    return norm(x, 'euclidean', axis, keepDims);
+}
+const euclideanNorm = op({ euclideanNorm_ });
 
 /**
  * @license
@@ -11779,59 +12363,6 @@ const softplus = op({ softplus_ });
  * =============================================================================
  */
 /**
- * Computes the maximum of elements across dimensions of a `tf.Tensor`.
- *
- * Reduces the input along the dimensions given in `axes`. Unless `keepDims`
- * is true, the rank of the `tf.Tensor` is reduced by 1 for each entry in
- * `axes`. If `keepDims` is true, the reduced dimensions are retained with
- * length 1. If `axes` has no entries, all dimensions are reduced, and an
- * `tf.Tensor` with a single element is returned.
- *
- * ```js
- * const x = tf.tensor1d([1, 2, 3]);
- *
- * x.max().print();  // or tf.max(x)
- * ```
- *
- * ```js
- * const x = tf.tensor2d([1, 2, 3, 4], [2, 2]);
- *
- * const axis = 1;
- * x.max(axis).print();  // or tf.max(x, axis)
- * ```
- *
- * @param x The input tensor.
- * @param axis The dimension(s) to reduce. By default it reduces
- *     all dimensions.
- * @param keepDims If true, retains reduced dimensions with size 1.
- *
- * @doc {heading: 'Operations', subheading: 'Reduction'}
- */
-function max_(x, axis = null, keepDims = false) {
-    const $x = convertToTensor(x, 'x', 'max');
-    const inputs = { x: $x };
-    const attrs = { reductionIndices: axis, keepDims };
-    return ENGINE.runKernel(Max, inputs, attrs);
-}
-const max = op({ max_ });
-
-/**
- * @license
- * Copyright 2020 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
  * Subtracts two `tf.Tensor`s element-wise, A - B. Supports broadcasting.
  *
  * ```js
@@ -11862,63 +12393,6 @@ function sub_(a, b) {
     return ENGINE.runKernel(Sub, inputs);
 }
 const sub = op({ sub_ });
-
-/**
- * @license
- * Copyright 2018 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
- * Computes the sum of elements across dimensions of a `tf.Tensor`.
- *
- * Reduces the input along the dimensions given in `axes`. Unless `keepDims`
- * is true, the rank of the `tf.Tensor` is reduced by 1 for each entry in
- * `axes`. If `keepDims` is true, the reduced dimensions are retained with
- * length 1. If axes has no entries, all dimensions are reduced, and a
- * `tf.Tensor` with a single element is returned.
- *
- * ```js
- * const x = tf.tensor1d([1, 2, 3]);
- *
- * x.sum().print();  // or tf.sum(x)
- * ```
- *
- * ```js
- * const x = tf.tensor2d([1, 2, 3, 4], [2, 2]);
- *
- * const axis = 1;
- * x.sum(axis).print();  // or tf.sum(x, axis)
- * ```
- *
- * @param x The input tensor to compute the sum over. If the dtype is `bool`
- *   it will be converted to `int32` and the output dtype will be `int32`.
- * @param axis The dimension(s) to reduce. By default it reduces
- *     all dimensions.
- * @param keepDims If true, retains reduced dimensions with size 1.
- *
- * @doc {heading: 'Operations', subheading: 'Reduction'}
- */
-function sum_(x, axis = null, keepDims = false) {
-    let $x = convertToTensor(x, 'x', 'sum');
-    if ($x.dtype === 'bool') {
-        $x = cast($x, 'int32');
-    }
-    const inputs = { x: $x };
-    const attrs = { axis, keepDims };
-    return ENGINE.runKernel(Sum, inputs, attrs);
-}
-const sum = op({ sum_ });
 
 /**
  * @license
@@ -12000,42 +12474,6 @@ function logSoftmax_(logits, axis = -1) {
     //            attrs as {} as NamedAttrMap);
 }
 const logSoftmax = op({ logSoftmax_ });
-
-/**
- * @license
- * Copyright 2017 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-function combineLocations(outputLoc, reduceLoc, axes) {
-    const rank = outputLoc.length + reduceLoc.length;
-    const loc = [];
-    let outIdx = 0;
-    let reduceIdx = 0;
-    for (let dim = 0; dim < rank; dim++) {
-        if (axes.indexOf(dim) === -1) {
-            loc.push(outputLoc[outIdx++]);
-        }
-        else {
-            loc.push(reduceLoc[reduceIdx++]);
-        }
-    }
-    return loc;
-}
-function expandShapeToKeepDim(shape, axes) {
-    const reduceSubShape = axes.map(x => 1);
-    return combineLocations(shape, reduceSubShape, axes);
-}
 
 /**
  * @license
@@ -12213,6 +12651,170 @@ function logicalOr_(a, b) {
     return ENGINE.runKernel(LogicalOr, inputs);
 }
 const logicalOr = op({ logicalOr_ });
+
+/**
+ * @license
+ * Copyright 2022 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+const INT32_MAX = 2147483648;
+/**
+ * Searches for where a value would go in a sorted sequence.
+ *
+ * This is not a method for checking containment (like javascript in).
+ *
+ * The typical use case for this operation is "binning", "bucketing", or
+ * "discretizing". The values are assigned to bucket-indices based on the edges
+ * listed in 'sortedSequence'. This operation returns the bucket-index for each
+ * value.
+ *
+ * The side argument controls which index is returned if a value lands exactly
+ * on an edge.
+ *
+ * The axis is not settable for this operation. It always operates on the
+ * innermost dimension (axis=-1). The operation will accept any number of outer
+ * dimensions.
+ *
+ * Note: This operation assumes that 'sortedSequence' is sorted along the
+ * innermost axis, maybe using 'sort(..., axis=-1)'. If the sequence is not
+ * sorted no error is raised and the content of the returned tensor is not well
+ * defined.
+ *
+ * ```js
+ * const edges = tf.tensor1d([-1, 3.3, 9.1, 10.0]);
+ * let values = tf.tensor1d([0.0, 4.1, 12.0]);
+ * const result1 = tf.searchSorted(edges, values, 'left');
+ * result1.print(); // [1, 2, 4]
+ *
+ * const seq = tf.tensor1d([0, 3, 9, 10, 10]);
+ * values = tf.tensor1d([0, 4, 10]);
+ * const result2 = tf.searchSorted(seq, values, 'left');
+ * result2.print(); // [0, 2, 3]
+ * const result3 = tf.searchSorted(seq, values, 'right');
+ * result3.print(); // [1, 2, 5]
+ *
+ * const sortedSequence = tf.tensor2d([[0., 3., 8., 9., 10.],
+ *                                     [1., 2., 3., 4., 5.]]);
+ * values = tf.tensor2d([[9.8, 2.1, 4.3],
+ *                       [0.1, 6.6, 4.5, ]]);
+ * const result4 = tf.searchSorted(sortedSequence, values, 'left');
+ * result4.print(); // [[4, 1, 2], [0, 5, 4]]
+ * ```
+ * @param sortedSequence: N-D. Sorted sequence.
+ * @param values: N-D. Search values.
+ * @param side: 'left'|'right'. Defaults to 'left'. 'left' corresponds to lower
+ *     bound and 'right' to upper bound.
+ * @return An N-D int32 tensor the size of values containing the result of
+ *     applying either lower bound or upper bound (depending on side) to each
+ *     value. The result is not a global index to the entire Tensor, but the
+ *     index in the last dimension.
+ * @doc {heading: 'Operations', subheading: 'Evaluation'}
+ */
+function searchSorted_(sortedSequence, values, side = 'left') {
+    const $sortedSequence = convertToTensor(sortedSequence, 'sortedSequence', 'searchSorted');
+    const $values = convertToTensor(values, 'values', 'searchSorted');
+    const sequenceSize = $sortedSequence.shape[$sortedSequence.shape.length - 1];
+    const valuesSize = $values.shape[$values.shape.length - 1];
+    const $sortedSequence2D = reshape($sortedSequence, [-1, sequenceSize]);
+    const $values2D = reshape($values, [-1, valuesSize]);
+    if ($sortedSequence2D.rank < 2) {
+        throw new Error(`Sorted input argument must be at least 2-dimensional`);
+    }
+    if ($sortedSequence2D.shape[0] !== $values2D.shape[0]) {
+        throw new Error(`Leading dimension of 'sortedSequence' and 'values' must match.`);
+    }
+    if (sizeFromShape($values2D.shape) >= INT32_MAX) {
+        throw new Error(`values tensor size must less than ${INT32_MAX}`);
+    }
+    if ($sortedSequence2D.shape[1] >= INT32_MAX) {
+        throw new Error(`trailing dim_size must less than ${INT32_MAX} for int32 output type, was ${$sortedSequence2D.shape[1]}`);
+    }
+    const inputs = {
+        sortedSequence: $sortedSequence2D,
+        values: $values2D,
+    };
+    const attrs = { side };
+    return ENGINE.runKernel(SearchSorted, inputs, attrs);
+}
+const searchSorted = op({ searchSorted_ });
+
+/**
+ * @license
+ * Copyright 2022 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Searches for where a value would go in a sorted sequence.
+ *
+ * This is not a method for checking containment (like javascript in).
+ *
+ * The typical use case for this operation is "binning", "bucketing", or
+ * "discretizing". The values are assigned to bucket-indices based on the edges
+ * listed in 'sortedSequence'. This operation returns the bucket-index for each
+ * value.
+ *
+ * The index returned corresponds to the first edge greater than or equal to the
+ * value.
+ *
+ * The axis is not settable for this operation. It always operates on the
+ * innermost dimension (axis=-1). The operation will accept any number of outer
+ * dimensions.
+ *
+ * Note: This operation assumes that 'lowerBound' is sorted along the
+ * innermost axis, maybe using 'sort(..., axis=-1)'. If the sequence is not
+ * sorted no error is raised and the content of the returned tensor is not well
+ * defined.
+ *
+ * ```js
+ * const edges = tf.tensor1d([-1, 3.3, 9.1, 10.0]);
+ * let values = tf.tensor1d([0.0, 4.1, 12.0]);
+ * const result1 = tf.lowerBound(edges, values);
+ * result1.print(); // [1, 2, 4]
+ *
+ * const seq = tf.tensor1d([0, 3, 9, 10, 10]);
+ * values = tf.tensor1d([0, 4, 10]);
+ * const result2 = tf.lowerBound(seq, values);
+ * result2.print(); // [0, 2, 3]
+ *
+ * const sortedSequence = tf.tensor2d([[0., 3., 8., 9., 10.],
+ *                                     [1., 2., 3., 4., 5.]]);
+ * values = tf.tensor2d([[9.8, 2.1, 4.3],
+ *                       [0.1, 6.6, 4.5, ]]);
+ * const result3 = tf.lowerBound(sortedSequence, values);
+ * result3.print(); // [[4, 1, 2], [0, 5, 4]]
+ * ```
+ * @param sortedSequence: N-D. Sorted sequence.
+ * @param values: N-D. Search values.
+ * @return An N-D int32 tensor the size of values containing the result of
+ *     applying lower bound to each value. The result is not a global index to
+ *     the entire Tensor, but the index in the last dimension.
+ * @doc {heading: 'Operations', subheading: 'Evaluation'}
+ */
+function lowerBound(sortedSequence, values) {
+    return searchSorted(sortedSequence, values, 'left');
+}
 
 /**
  * @license
@@ -12602,60 +13204,6 @@ function ones(shape, dtype = 'float32') {
 
 /**
  * @license
- * Copyright 2020 Google Inc. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
- * Computes the minimum value from the input.
- *
- * Reduces the input along the dimensions given in `axes`. Unless `keepDims`
- * is true, the rank of the array is reduced by 1 for each entry in `axes`.
- * If `keepDims` is true, the reduced dimensions are retained with length 1.
- * If `axes` has no entries, all dimensions are reduced, and an array with a
- * single element is returned.
- *
- * ```js
- * const x = tf.tensor1d([1, 2, 3]);
- *
- * x.min().print();  // or tf.min(x)
- * ```
- *
- * ```js
- * const x = tf.tensor2d([1, 2, 3, 4], [2, 2]);
- *
- * const axis = 1;
- * x.min(axis).print();  // or tf.min(x, axis)
- * ```
- *
- * @param x The input Tensor.
- * @param axis The dimension(s) to reduce. By default it reduces
- *     all dimensions.
- * @param keepDims If true, retains reduced dimensions with size 1.
- *
- * @doc {heading: 'Operations', subheading: 'Reduction'}
- */
-function min_(x, axis = null, keepDims = false) {
-    const $x = convertToTensor(x, 'x', 'min');
-    const inputs = { x: $x };
-    const attrs = { axis, keepDims };
-    // tslint:disable-next-line: no-unnecessary-type-assertion
-    return ENGINE.runKernel(Min, inputs, attrs);
-}
-const min = op({ min_ });
-
-/**
- * @license
  * Copyright 2020 Google LLC. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12828,41 +13376,6 @@ function mod_(a, b) {
     return ENGINE.runKernel(Mod, inputs);
 }
 const mod = op({ mod_ });
-
-/**
- * @license
- * Copyright 2019 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
- * Computes square of `x` element-wise: `x ^ 2`
- *
- * ```js
- * const x = tf.tensor1d([1, 2, Math.sqrt(2), -1]);
- *
- * x.square().print();  // or tf.square(x)
- * ```
- * @param x The input Tensor.
- *
- * @doc {heading: 'Operations', subheading: 'Basic math'}
- */
-function square_(x) {
-    const $x = convertToTensor(x, 'x', 'square');
-    const attrs = {};
-    return ENGINE.runKernel('Square', { x: $x }, attrs);
-}
-const square = op({ square_ });
 
 /**
  * @license
@@ -13134,59 +13647,6 @@ function spaceToBatchND_(x, blockShape, paddings) {
     return ENGINE.runKernel(SpaceToBatchND, inputs, attrs);
 }
 const spaceToBatchND = op({ spaceToBatchND_ });
-
-/**
- * @license
- * Copyright 2020 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
- * Computes the power of one `tf.Tensor` to another. Supports broadcasting.
- *
- * Given a `tf.Tensor` x and a `tf.Tensor` y, this operation computes x^y for
- * corresponding elements in x and y. The result's dtype will be the upcasted
- * type of the `base` and `exp` dtypes.
- *
- * ```js
- * const a = tf.tensor([[2, 3], [4, 5]])
- * const b = tf.tensor([[1, 2], [3, 0]]).toInt();
- *
- * a.pow(b).print();  // or tf.pow(a, b)
- * ```
- *
- * ```js
- * const a = tf.tensor([[1, 2], [3, 4]])
- * const b = tf.tensor(2).toInt();
- *
- * a.pow(b).print();  // or tf.pow(a, b)
- * ```
- * We also expose `powStrict` which has the same signature as this op and
- * asserts that `base` and `exp` are the same shape (does not broadcast).
- *
- * @param base The base `tf.Tensor` to pow element-wise.
- * @param exp The exponent `tf.Tensor` to pow element-wise.
- *
- * @doc {heading: 'Operations', subheading: 'Arithmetic'}
- */
-function pow_(base, exp) {
-    let $base = convertToTensor(base, 'base', 'pow');
-    let $exp = convertToTensor(exp, 'exp', 'pow');
-    [$base, $exp] = makeTypesMatch($base, $exp);
-    const inputs = { a: $base, b: $exp };
-    return ENGINE.runKernel(Pow, inputs);
-}
-const pow = op({ pow_ });
 
 /**
  * @license
@@ -14705,53 +15165,6 @@ const rsqrt = op({ rsqrt_ });
 
 /**
  * @license
- * Copyright 2018 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
- * Creates rank-0 `tf.Tensor` (scalar) with the provided value and dtype.
- *
- * The same functionality can be achieved with `tf.tensor`, but in general
- * we recommend using `tf.scalar` as it makes the code more readable.
- *
- * ```js
- * tf.scalar(3.14).print();
- * ```
- *
- * @param value The value of the scalar.
- * @param dtype The data type.
- *
- * @doc {heading: 'Tensors', subheading: 'Creation'}
- */
-function scalar(value, dtype) {
-    if (((isTypedArray(value) && dtype !== 'string') || Array.isArray(value)) &&
-        dtype !== 'complex64') {
-        throw new Error('Error creating a new Scalar: value must be a primitive ' +
-            '(number|boolean|string)');
-    }
-    if (dtype === 'string' && isTypedArray(value) &&
-        !(value instanceof Uint8Array)) {
-        throw new Error('When making a scalar from encoded string, ' +
-            'the value must be `Uint8Array`.');
-    }
-    const shape = [];
-    const inferredShape = [];
-    return makeTensor(value, shape, inferredShape, dtype);
-}
-
-/**
- * @license
  * Copyright 2020 Google LLC. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15293,41 +15706,6 @@ function rfft_(input, fftLength) {
     return reshape(complex(realComplexConjugate[0], imagComplexConjugate[0]), outputShape);
 }
 const rfft = op({ rfft_ });
-
-/**
- * @license
- * Copyright 2018 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
- * Computes square root of the input `tf.Tensor` element-wise: `y = sqrt(x)`
- *
- * ```js
- * const x = tf.tensor1d([1, 2, 4, -1]);
- *
- * x.sqrt().print();  // or tf.sqrt(x)
- * ```
- * @param x The input tensor.
- *
- * @doc {heading: 'Operations', subheading: 'Basic math'}
- */
-function sqrt_(x) {
-    const $x = convertToTensor(x, 'x', 'sqrt', 'float32');
-    const inputs = { x: $x };
-    return ENGINE.runKernel(Sqrt, inputs);
-}
-const sqrt = op({ sqrt_ });
 
 /**
  * @license
@@ -15920,6 +16298,60 @@ const unstack = op({ unstack_ });
 
 /**
  * @license
+ * Copyright 2022 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Searches for where a value would go in a sorted sequence.
+ *
+ * This is not a method for checking containment (like javascript in).
+ *
+ * The typical use case for this operation is "binning", "bucketing", or
+ * "discretizing". The values are assigned to bucket-indices based on the edges
+ * listed in 'sortedSequence'. This operation returns the bucket-index for each
+ * value.
+ *
+ * The index returned corresponds to the first edge greater than the value.
+ *
+ * The axis is not settable for this operation. It always operates on the
+ * innermost dimension (axis=-1). The operation will accept any number of outer
+ * dimensions.
+ *
+ * Note: This operation assumes that 'upperBound' is sorted along the
+ * innermost axis, maybe using 'sort(..., axis=-1)'. If the sequence is not
+ * sorted no error is raised and the content of the returned tensor is not well
+ * defined.
+ *
+ * ```js
+ * const seq = tf.tensor1d([0, 3, 9, 10, 10]);
+ * const values = tf.tensor1d([0, 4, 10]);
+ * const result = tf.upperBound(seq, values);
+ * result.print(); // [1, 2, 5]
+ * ```
+ * @param sortedSequence: N-D. Sorted sequence.
+ * @param values: N-D. Search values.
+ * @return An N-D int32 tensor the size of values containing the result of
+ *     applying upper bound to each value. The result is not a global index to
+ *     the entire Tensor, but the index in the last dimension.
+ * @doc {heading: 'Operations', subheading: 'Evaluation'}
+ */
+function upperBound(sortedSequence, values) {
+    return searchSorted(sortedSequence, values, 'right');
+}
+
+/**
+ * @license
  * Copyright 2018 Google LLC. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15997,117 +16429,6 @@ async function whereAsync_(condition) {
     return res;
 }
 const whereAsync = whereAsync_;
-
-/**
- * @license
- * Copyright 2018 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-/**
- * Computes the norm of scalar, vectors, and matrices.
- * This function can compute several different vector norms (the 1-norm, the
- * Euclidean or 2-norm, the inf-norm, and in general the p-norm for p > 0)
- * and matrix norms (Frobenius, 1-norm, and inf-norm).
- *
- * ```js
- * const x = tf.tensor1d([1, 2, 3, 4]);
- *
- * x.norm().print();  // or tf.norm(x)
- * ```
- *
- * @param x The input array.
- * @param ord Optional. Order of the norm. Supported norm types are
- * following:
- *
- *  | ord        | norm for matrices         | norm for vectors
- *  |------------|---------------------------|---------------------
- *  |'euclidean' |Frobenius norm             |2-norm
- *  |'fro'       |Frobenius norm	           |
- *  |Infinity    |max(sum(abs(x), axis=1))   |max(abs(x))
- *  |-Infinity   |min(sum(abs(x), axis=1))   |min(abs(x))
- *  |1           |max(sum(abs(x), axis=0))   |sum(abs(x))
- *  |2           |                           |sum(abs(x)^2)^1/2*
- *
- * @param axis Optional. If axis is null (the default), the input is
- * considered a vector and a single vector norm is computed over the entire
- * set of values in the Tensor, i.e. norm(x, ord) is equivalent
- * to norm(x.reshape([-1]), ord). If axis is a integer, the input
- * is considered a batch of vectors, and axis determines the axis in x
- * over which to compute vector norms. If axis is a 2-tuple of integer it is
- * considered a batch of matrices and axis determines the axes in NDArray
- * over which to compute a matrix norm.
- * @param keepDims Optional. If true, the norm have the same dimensionality
- * as the input.
- *
- * @doc {heading: 'Operations', subheading: 'Matrices'}
- */
-function norm_(x, ord = 'euclidean', axis = null, keepDims = false) {
-    x = convertToTensor(x, 'x', 'norm');
-    const norm = normImpl(x, ord, axis);
-    let keepDimsShape = norm.shape;
-    if (keepDims) {
-        const axes = parseAxisParam(axis, x.shape);
-        keepDimsShape = expandShapeToKeepDim(norm.shape, axes);
-    }
-    return reshape(norm, keepDimsShape);
-}
-function normImpl(x, p, axis = null) {
-    if (x.rank === 0) {
-        return abs(x);
-    }
-    // consider vector when no axis is specified
-    if (x.rank !== 1 && axis === null) {
-        return normImpl(reshape(x, [-1]), p, axis);
-    }
-    // vector
-    if (x.rank === 1 || typeof axis === 'number' ||
-        Array.isArray(axis) && axis.length === 1) {
-        if (p === 1) {
-            return sum(abs(x), axis);
-        }
-        if (p === Infinity) {
-            return max(abs(x), axis);
-        }
-        if (p === -Infinity) {
-            return min(abs(x), axis);
-        }
-        if (p === 'euclidean' || p === 2) {
-            // norm(x, 2) = sum(abs(xi) ^ 2) ^ 1/2
-            return sqrt(sum(pow(abs(x), scalar(2, 'int32')), axis));
-        }
-        throw new Error(`Error in norm: invalid ord value: ${p}`);
-    }
-    // matrix (assumption axis[0] < axis[1])
-    if (Array.isArray(axis) && axis.length === 2) {
-        if (p === 1) {
-            return max(sum(abs(x), axis[0]), axis[1] - 1);
-        }
-        if (p === Infinity) {
-            return max(sum(abs(x), axis[1]), axis[0]);
-        }
-        if (p === -Infinity) {
-            return min(sum(abs(x), axis[1]), axis[0]);
-        }
-        if (p === 'fro' || p === 'euclidean') {
-            // norm(x) = sqrt(sum(pow(x, 2)))
-            return sqrt(sum(square(x), axis));
-        }
-        throw new Error(`Error in norm: invalid ord value: ${p}`);
-    }
-    throw new Error(`Error in norm: invalid axis: ${axis}`);
-}
-const norm = op({ norm_ });
 
 /**
  * @license
@@ -16250,7 +16571,7 @@ function validateInput(sparseIndices, sparseValues, outputShape, defaultValues) 
  */
 function sparseToDense_(sparseIndices, sparseValues, outputShape, defaultValue = 0) {
     const $sparseIndices = convertToTensor(sparseIndices, 'sparseIndices', 'sparseToDense', 'int32');
-    const $sparseValues = convertToTensor(sparseValues, 'sparseValues', 'sparseToDense');
+    const $sparseValues = convertToTensor(sparseValues, 'sparseValues', 'sparseToDense', 'string_or_numeric');
     const $defaultValue = convertToTensor(defaultValue, 'defaultValue', 'sparseToDense', $sparseValues.dtype);
     validateInput($sparseIndices, $sparseValues, outputShape, $defaultValue);
     const inputs = {
@@ -16590,7 +16911,20 @@ function fusedConv2d_({ x, filter, strides, pad, dataFormat = 'NHWC', dilations 
     if (bias != null) {
         $bias = convertToTensor(bias, 'bias', 'fused conv2d');
         [$bias] = makeTypesMatch($bias, $x);
-        assertAndGetBroadcastShape(convInfo.outShape, $bias.shape);
+        // According to TensorFlow, the bias is supposed be a 1-D tensor or a
+        // scalar.
+        if (dataFormat === 'NHWC') {
+            assertAndGetBroadcastShape(convInfo.outShape, $bias.shape);
+        }
+        else {
+            assert($bias.shape.length <= 1, () => `Error in fused conv2d: only supports scalar or 1-D Tensor ` +
+                `bias for NCHW format but got the bias of ` +
+                `rank-${$bias.shape.length}.`);
+            assert($bias.shape.length === 0 || $bias.shape[0] === convInfo.outChannels ||
+                $bias.shape[0] === 1, () => `Error in fused conv2d: bias shape (${$bias.shape}) is not ` +
+                `compatible with the number of output channels ` +
+                `(${convInfo.outChannels})`);
+        }
     }
     let $preluActivationWeights;
     if (preluActivationWeights != null) {
@@ -22061,6 +22395,29 @@ const json$g = [
         ]
     },
     {
+        'tfOpName': 'TensorListConcatV2',
+        'category': 'control',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'tensorListId',
+                'type': 'tensor'
+            }
+        ],
+        'attrs': [
+            {
+                'tfName': 'element_shape',
+                'name': 'elementShape',
+                'type': 'shape'
+            },
+            {
+                'tfName': 'element_dtype',
+                'name': 'elementDType',
+                'type': 'dtype'
+            }
+        ]
+    },
+    {
         'tfOpName': 'TensorListPopBack',
         'category': 'control',
         'inputs': [
@@ -22103,6 +22460,33 @@ const json$g = [
                 'tfName': 'element_dtype',
                 'name': 'elementDType',
                 'type': 'dtype'
+            }
+        ]
+    },
+    {
+        'tfOpName': 'TensorListLength',
+        'category': 'control',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'tensorListId',
+                'type': 'tensor'
+            }
+        ]
+    },
+    {
+        'tfOpName': 'TensorListResize',
+        'category': 'control',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'tensorListId',
+                'type': 'tensor'
+            },
+            {
+                'start': 1,
+                'name': 'size',
+                'type': 'number'
             }
         ]
     }
@@ -23405,6 +23789,22 @@ var dynamic = /*#__PURE__*/Object.freeze({
  */
 const json$c = [
     {
+        'tfOpName': 'LowerBound',
+        'category': 'evaluation',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'sortedSequence',
+                'type': 'tensor'
+            },
+            {
+                'start': 1,
+                'name': 'values',
+                'type': 'tensor'
+            }
+        ]
+    },
+    {
         'tfOpName': 'TopKV2',
         'category': 'evaluation',
         'inputs': [
@@ -23424,6 +23824,22 @@ const json$c = [
                 'tfName': 'sorted',
                 'name': 'sorted',
                 'type': 'bool'
+            }
+        ]
+    },
+    {
+        'tfOpName': 'UpperBound',
+        'category': 'evaluation',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'sortedSequence',
+                'type': 'tensor'
+            },
+            {
+                'start': 1,
+                'name': 'values',
+                'type': 'tensor'
             }
         ]
     },
@@ -24043,6 +24459,44 @@ const json$9 = [
                 'type': 'number'
             }
         ]
+    },
+    {
+        'tfOpName': 'ImageProjectiveTransformV3',
+        'category': 'image',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'images',
+                'type': 'tensor'
+            },
+            {
+                'start': 1,
+                'name': 'transforms',
+                'type': 'tensor'
+            },
+            {
+                'start': 2,
+                'name': 'outputShape',
+                'type': 'number[]'
+            },
+            {
+                'start': 3,
+                'name': 'fillValue',
+                'type': 'number'
+            }
+        ],
+        'attrs': [
+            {
+                'tfName': 'interpolation',
+                'name': 'interpolation',
+                'type': 'string'
+            },
+            {
+                'tfName': 'fill_mode',
+                'name': 'fillMode',
+                'type': 'string'
+            }
+        ]
     }
 ];
 
@@ -24607,6 +25061,30 @@ var matrices = /*#__PURE__*/Object.freeze({
  */
 const json$6 = [
     {
+        'tfOpName': 'EuclideanNorm',
+        'category': 'normalization',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'x',
+                'type': 'tensor'
+            },
+            {
+                'start': 1,
+                'name': 'axis',
+                'type': 'number[]'
+            }
+        ],
+        'attrs': [
+            {
+                'tfName': 'keep_dims',
+                'name': 'keepDims',
+                'type': 'bool',
+                'defaultValue': false
+            }
+        ]
+    },
+    {
         'tfOpName': 'FusedBatchNorm',
         'category': 'normalization',
         'inputs': [
@@ -25097,6 +25575,34 @@ const json$5 = [
             {
                 'tfName': 'keep_dims',
                 'name': 'keepDims',
+                'type': 'bool'
+            }
+        ]
+    },
+    {
+        'tfOpName': 'Cumprod',
+        'category': 'reduction',
+        'inputs': [
+            {
+                'start': 0,
+                'name': 'x',
+                'type': 'tensor'
+            },
+            {
+                'start': 1,
+                'name': 'axis',
+                'type': 'number'
+            }
+        ],
+        'attrs': [
+            {
+                'tfName': 'exclusive',
+                'name': 'exclusive',
+                'type': 'bool'
+            },
+            {
+                'tfName': 'reverse',
+                'name': 'reverse',
                 'type': 'bool'
             }
         ]
@@ -26275,7 +26781,7 @@ class OperationMapper {
             op: node.op,
             category: mapper.category,
             inputNames: (node.input ||
-                []).map(input => input.startsWith('^') ? input.substr(1) : input),
+                []).map(input => input.startsWith('^') ? input.slice(1) : input),
             inputs: [],
             children: [],
             inputParams: {},
@@ -27335,7 +27841,12 @@ class TensorList {
         if (this.maxNumElements !== -1 && size > this.maxNumElements) {
             throw new Error(`TensorListResize input size ${size} is greater maxNumElement ${this.maxNumElements}.`);
         }
-        this.tensors.length = size;
+        const destTensorList = new TensorList([], this.elementShape, this.elementDtype, this.maxNumElements);
+        destTensorList.tensors.length = size;
+        for (let i = 0; i < Math.min(this.tensors.length, size); ++i) {
+            destTensorList.tensors[i] = this.tensors[i];
+        }
+        return destTensorList;
     }
     /**
      * Retrieve the element at the provided index
@@ -27751,7 +28262,8 @@ const executeOp$h = async (node, tensorMap, context) => {
             context.addTensorList(tensorList);
             return [tensorList.idTensor];
         }
-        case 'TensorListConcat': {
+        case 'TensorListConcat':
+        case 'TensorListConcatV2': {
             const concatId = getParamValue('tensorListId', node, tensorMap, context);
             const tensorList = context.getTensorList(concatId.id);
             const concatDtype = getParamValue('dtype', node, tensorMap, context);
@@ -27779,6 +28291,19 @@ const executeOp$h = async (node, tensorMap, context) => {
             const tensorList = split(splitTensor, lengths, elementShape);
             context.addTensorList(tensorList);
             return [tensorList.idTensor];
+        }
+        case 'TensorListLength': {
+            const idTensor = getParamValue('tensorListId', node, tensorMap, context);
+            const tensorList = context.getTensorList(idTensor.id);
+            return [scalar(tensorList.size(), 'int32')];
+        }
+        case 'TensorListResize': {
+            const idTensor = getParamValue('tensorListId', node, tensorMap, context);
+            const size = getParamValue('size', node, tensorMap, context);
+            const srcTensorList = context.getTensorList(idTensor.id);
+            const destTensorList = srcTensorList.resize(size);
+            context.addTensorList(destTensorList);
+            return [destTensorList.idTensor];
         }
         default:
             throw TypeError(`Node type ${node.op} is not implemented`);
@@ -28124,12 +28649,22 @@ const executeOp$e = async (node, tensorMap, context) => {
  */
 const executeOp$d = (node, tensorMap, context) => {
     switch (node.op) {
+        case 'LowerBound': {
+            const sortedSequence = getParamValue('sortedSequence', node, tensorMap, context);
+            const values = getParamValue('values', node, tensorMap, context);
+            return [lowerBound(sortedSequence, values)];
+        }
         case 'TopKV2': {
             const x = getParamValue('x', node, tensorMap, context);
             const k = getParamValue('k', node, tensorMap, context);
             const sorted = getParamValue('sorted', node, tensorMap, context);
             const result = topk(x, k, sorted);
             return [result.values, result.indices];
+        }
+        case 'UpperBound': {
+            const sortedSequence = getParamValue('sortedSequence', node, tensorMap, context);
+            const values = getParamValue('values', node, tensorMap, context);
+            return [upperBound(sortedSequence, values)];
         }
         case 'Unique': {
             const x = getParamValue('x', node, tensorMap, context);
@@ -28439,6 +28974,15 @@ const executeOp$a = (node, tensorMap, context) => {
             const extrapolationValue = getParamValue('extrapolationValue', node, tensorMap, context);
             return [image$1.cropAndResize(image, boxes, boxInd, cropSize, method, extrapolationValue)];
         }
+        case 'ImageProjectiveTransformV3': {
+            const images = getParamValue('images', node, tensorMap, context);
+            const transforms = getParamValue('transforms', node, tensorMap, context);
+            const outputShape = getParamValue('outputShape', node, tensorMap, context);
+            const fillValue = getParamValue('fillValue', node, tensorMap, context);
+            const interpolation = getParamValue('interpolation', node, tensorMap, context);
+            const fillMode = getParamValue('fillMode', node, tensorMap, context);
+            return [image$1.transform(images, transforms, interpolation.toLowerCase(), fillMode.toLowerCase(), fillValue, outputShape)];
+        }
         default:
             throw TypeError(`Node type ${node.op} is not implemented`);
     }
@@ -28573,6 +29117,8 @@ const executeOp$8 = (node, tensorMap, context) => {
  */
 const executeOp$7 = (node, tensorMap, context) => {
     switch (node.op) {
+        case 'EuclideanNorm':
+            return [euclideanNorm(getParamValue('x', node, tensorMap, context), getParamValue('axis', node, tensorMap, context), getParamValue('keepDims', node, tensorMap, context))];
         case 'FusedBatchNorm':
         case 'FusedBatchNormV2': {
             return [batchNorm(getParamValue('x', node, tensorMap, context), getParamValue('mean', node, tensorMap, context), getParamValue('variance', node, tensorMap, context), getParamValue('offset', node, tensorMap, context), getParamValue('scale', node, tensorMap, context), getParamValue('epsilon', node, tensorMap, context))];
@@ -28657,6 +29203,12 @@ const executeOp$6 = (node, tensorMap, context) => {
             const axis = getParamValue('axis', node, tensorMap, context);
             const keepDims = getParamValue('keepDims', node, tensorMap, context);
             return [prod(getParamValue('x', node, tensorMap, context), axis, keepDims)];
+        }
+        case 'Cumprod': {
+            const axis = getParamValue('axis', node, tensorMap, context);
+            const exclusive = getParamValue('exclusive', node, tensorMap, context);
+            const reverse = getParamValue('reverse', node, tensorMap, context);
+            return [cumprod(getParamValue('x', node, tensorMap, context), axis, exclusive, reverse)];
         }
         case 'Cumsum': {
             const axis = getParamValue('axis', node, tensorMap, context);
