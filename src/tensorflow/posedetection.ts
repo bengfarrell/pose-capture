@@ -39,14 +39,7 @@ export const processFrame = async (source: VideoPoseBase) => {
                             keypoint.z as number
                         ]
                     });
-                    min[0] = Math.min(keypoint.x, min[0]);
-                    min[1] = Math.min(keypoint.y, min[1]);
-                    min[2] = Math.min(keypoint.z || -Infinity, min[2]);
-                    max[0] = Math.max(keypoint.x, max[0]);
-                    max[1] = Math.max(keypoint.y, max[1]);
-                    max[2] = Math.max(keypoint.z || Infinity, max[2]);
                 });
-                keyframe.bounds = { minX: min[0], minY: min[1], minZ: min[2], maxX: max[0], maxY: max[1], maxZ: max[2] }
                 keyframes.push(keyframe);
             });
         }

@@ -20,7 +20,7 @@ export const load = async function() {
     });
 }
 
-export const processFrame = async function(source: VideoPoseBase) {
+export const processFrame = async function (source: VideoPoseBase, recordingStartTime: number) {
     const keyframes: Keyframe[] = [];
     if (model) {
         const parts = await model.segmentPersonParts(source.videoElement, {
@@ -34,11 +34,11 @@ export const processFrame = async function(source: VideoPoseBase) {
         if (parts) {
             parts.allPoses.forEach((pose: Pose, index) => {
                 const keyframe: Keyframe = {
-                    time: Date.now(),
+                    time: Date.now() - recordingStartTime,
                     score: pose.score,
                     pose: index,
                     points: [],
-                    bounds: {}
+                    aspectRatio: source.aspectRatio
                 }
                 pose.keypoints.forEach((keypoint: Keypoint) => {
                     keyframe.points.push({

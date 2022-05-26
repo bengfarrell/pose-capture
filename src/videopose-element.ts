@@ -12,7 +12,7 @@ export interface Point {
 export interface Keyframe {
     time: number;
     pose: number;
-    bounds: { minX?: number; maxX?: number; minY?: number; maxY?: number; minZ?: number; maxZ?: number; }
+    aspectRatio: number;
     score?: number;
     points: Point[];
 }
@@ -23,6 +23,8 @@ export class VideoPoseBase extends Video {
     protected hasStarted: boolean = false;
 
     protected audioRecorder?: MediaRecorder;
+
+    protected audioData?: string;
 
     protected recordingStartTime?: number;
 
@@ -35,6 +37,14 @@ export class VideoPoseBase extends Video {
 
     public get keyframes() {
         return this._keyframes.slice();
+    }
+
+    public get recording() {
+        return {
+            keyframes: this.keyframes,
+            audio: this.audioData,
+            duration: this.recordingDuration
+        }
     }
 
     public saveRecording() {
@@ -85,7 +95,7 @@ export class VideoPoseBase extends Video {
     }
 
     protected onTimerUpdate() {
-        if (this.isRecording) {
+        if (this.isRecording && this.recordingStartTime) {
             this._recordingDuration = Date.now() - this.recordingStartTime;
         }
         super.onTimerUpdate();
@@ -100,6 +110,7 @@ export class VideoPoseBase extends Video {
         this.recordingStartTime = Date.now();
         this._keyframes = [];
         this.recordedAudio = undefined;
+        this.audioData = undefined;
         this.updateControls();
         if (includeAudio) {
             const stream = (this.videoEl as any).captureStream();
@@ -112,6 +123,16 @@ export class VideoPoseBase extends Video {
                 this.audioRecorder.ondataavailable = (e: any) => {
                     segments.push(e.data);
                     this.recordedAudio = new Blob(segments);
+                    if (this.recordedAudio) {
+                        const reader = new FileReader();
+                        reader.readAsDataURL(this.recordedAudio);
+                        new Promise(() => {
+                            reader.onloadend = () => {
+                                this.audioData = (reader.result as string).replace('application/octet-stream', 'audio/webm');
+                                console.log(this.recording);
+                            };
+                        });
+                    }
                 }
                 this.audioRecorder.start();
             }
@@ -121,6 +142,10 @@ export class VideoPoseBase extends Video {
     stopRecording() {
         this._isRecording = false;
         this._isAudioRecording = false;
+        if (this.recordingStartTime) {
+            this._recordingDuration = Date.now() - this.recordingStartTime;
+        }
+
         this.updateControls();
         if (this.audioRecorder) {
             this.audioRecorder.requestData();

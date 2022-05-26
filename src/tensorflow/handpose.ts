@@ -17,17 +17,17 @@ export const load = async function() {
     detector = await handpose.createDetector(model, detectorConfig);
 }
 
-export const processFrame = async (source: VideoPoseBase) => {
+export const processFrame = async (source: VideoPoseBase, recordingStartTime: number) => {
     const keyframes: Keyframe[] = [];
     if (detector) {
         const hands = await detector.estimateHands(source.videoElement);
         hands.forEach( (hand: Hand, index) => {
             const keyframe: Keyframe = {
-                time: Date.now(),
+                time: Date.now() - recordingStartTime,
                 score: hand.score,
                 pose: index,
                 points: [],
-                bounds: {}
+                aspectRatio: source.aspectRatio
             }
             // Todo: keypoints3D are in meters, how best to surface this data?
             hand.keypoints?.forEach( (keypoint: Keypoint) => {

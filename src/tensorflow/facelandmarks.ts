@@ -18,7 +18,7 @@ export const load = async function() {
         facelandmarks.SupportedPackages.mediapipeFacemesh);
 }
 
-export const processFrame = async (source: VideoPoseBase, options: FacelandmarksOptions) => {
+export const processFrame = async (source: VideoPoseBase, recordingStartTime: number, options: FacelandmarksOptions) => {
     const keyframes: Keyframe[] = [];
     if (model) {
         const predictions: AnnotatedPrediction[] = await model.estimateFaces({
@@ -32,10 +32,10 @@ export const processFrame = async (source: VideoPoseBase, options: Facelandmarks
             const max = [-Infinity, -Infinity, -Infinity];
             const min = [Infinity, Infinity, Infinity];
             const keyframe: Keyframe = {
-                time: Date.now(),
+                time: Date.now() - recordingStartTime,
                 pose: p,
                 points: [],
-                bounds: {}
+                aspectRatio: source.aspectRatio
             }
 
             Object.keys((prediction as any).annotations).forEach((name: string) => {
@@ -50,13 +50,6 @@ export const processFrame = async (source: VideoPoseBase, options: Facelandmarks
                             point[2]
                         ]
                     });
-                    min[0] = Math.min(point[0], min[0]);
-                    min[1] = Math.min(point[1], min[1]);
-                    min[2] = Math.min(point[2], min[2]);
-                    max[0] = Math.max(point[0], max[0]);
-                    max[1] = Math.max(point[1], max[1]);
-                    max[2] = Math.max(point[2], max[2]);
-
 
                     if (options.includeMeshPoints) {
                         // prune any found and annotated points from the mesh list
@@ -83,15 +76,8 @@ export const processFrame = async (source: VideoPoseBase, options: Facelandmarks
                             point[2]
                         ]
                     });
-                    min[0] = Math.min(point[0], min[0]);
-                    min[1] = Math.min(point[1], min[1]);
-                    min[2] = Math.min(point[2], min[2]);
-                    max[0] = Math.max(point[0], max[0]);
-                    max[1] = Math.max(point[1], max[1]);
-                    max[2] = Math.max(point[2], max[2]);
                 }
             }
-            keyframe.bounds = { minX: min[0], minY: min[1], minZ: min[2], maxX: max[0], maxY: max[1], maxZ: max[2] }
             keyframes.push(keyframe);
         }
     }
