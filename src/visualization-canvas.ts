@@ -1,4 +1,4 @@
-import { Bounds } from './abstractplayer';
+import { Bounds } from './baseplayer';
 import { AbstractPoseVisualizer } from './abstractvisualizer';
 import { Keyframe, Point } from './videopose-element';
 

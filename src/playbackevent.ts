@@ -1,4 +1,4 @@
-import { AbstractPlayerState } from './abstractplayer';
+import { PlayerState } from './baseplayer';
 
 export class PlaybackEvent extends Event {
     public static Type: string = 'playcontrolsevent';
@@ -9,24 +9,31 @@ export class PlaybackEvent extends Event {
 
     public static TIMELINE_SCRUB = 'onTimelineScrub';
 
+    public static TOGGLE_RECORD_POSE = 'onRecordPose';
+
+    public static TOGGLE_RECORD_POSE_AND_AUDIO = 'onRecordPoseAndAudio';
+
     public static LOOP = 'onLoopChange';
 
     public action: string;
 
-    public state: AbstractPlayerState;
+    public state: PlayerState;
 
-    public constructor(action: string, state: AbstractPlayerState, eventInitDict: EventInit) {
+    public constructor(action: string, state: PlayerState, eventInitDict: EventInit) {
         super(PlaybackEvent.Type, eventInitDict);
         this.action = action;
-        this.state = this.stateAsJSON(state);
+        this.state = this.toMinimalState(state);
     }
 
-    protected stateAsJSON(state: AbstractPlayerState): AbstractPlayerState {
+    protected toMinimalState(state: PlayerState): PlayerState {
         return {
             currentTime: state.currentTime,
             duration: state.duration,
             isLooping: state.isLooping,
             isPlaying: state.isPlaying,
+            isRecording: state.isRecording,
+            isAudioRecording: state.isAudioRecording,
+            recordingDuration: state.recordingDuration
         }
     }
 }

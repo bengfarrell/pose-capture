@@ -11,7 +11,7 @@ export default class BodyPixVideo extends VideoPoseBase {
     }
 
     async poseDetectionFrame() {
-        if (this.playing && this.videoEl.readyState > 1) {
+        if (this.isPlaying && this.videoEl.readyState > 1) {
             const result = await processFrame(this);
             this.onPoseFrame(result);
         }

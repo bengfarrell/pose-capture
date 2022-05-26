@@ -1,40 +1,10 @@
 import { Events } from './events';
-import { Bounds } from "./abstractplayer";
+import { BasePlayer } from "./baseplayer";
 
-export class Video extends HTMLElement {
+export class Video extends BasePlayer {
     static get observedAttributes() {
         return ['camera', 'source', 'loop']
     }
-
-    /**
-     * whether to loop video playback
-     */
-    public loop: boolean = false;
-
-    /**
-     * is video playing?
-     */
-    protected playing: boolean = false;
-
-    /**
-     * width of component
-     */
-    protected width: number = 0;
-
-    /**
-     * height of component
-     */
-    protected height: number = 0;
-
-    /**
-     * aspect ratio of video
-     */
-    protected aspectRatio: number = 0;
-
-    /**
-     * visible area bounding box
-     */
-    protected visibleMediaRect: Bounds = { x: 0, y: 0, width: 0, height: 0 };
 
     /**
      * video element
@@ -56,29 +26,11 @@ export class Video extends HTMLElement {
      */
     protected isComponentMounted: boolean = false;
 
-    public get videoBounds() {
-        return this.visibleMediaRect;
-    }
-
-    public get duration() {
-        return this.videoEl.duration;
-    }
-
     /**
      * get access to video element
      */
     public get videoElement() {
         return this.videoEl;
-    }
-
-    /**
-     * get video element's natural size
-     */
-    public get naturalSize() {
-        return {
-            width: this.videoEl.videoWidth,
-            height: this.videoEl.videoHeight
-        };
     }
 
     constructor() {
@@ -101,6 +53,10 @@ export class Video extends HTMLElement {
                 video, ::slotted(*) {
                     position: absolute;
                 }
+                    
+                ::slotted(*) {
+                    width: 100%;
+                }
             </style>
             <video playsinline></video>
             <slot></slot>`;
@@ -108,10 +64,10 @@ export class Video extends HTMLElement {
 
         this.videoEl = this.shadowRoot?.querySelector('video') as HTMLVideoElement;
 
-        if (this.loop) {
+        if (this._isLooping) {
             this.videoEl.loop = true;
         }
-        this.playing = false;
+        this._isPlaying = false;
 
         this.videoEl.onloadedmetadata = () => this.onMetadata();
         this.videoEl.onloadeddata = () => {
@@ -124,32 +80,39 @@ export class Video extends HTMLElement {
         };
 
         this.videoEl.onpause = () => {
-            this.playing = false;
-            clearInterval(this.timer);
+            this._isPlaying = false;
+            clearInterval(this.timer as number);
             this.dispatchEvent(new Event(Events.VIDEO_PAUSE, { bubbles: true, composed: true }));
         }
 
         this.videoEl.onended = () => this.onEnded();
 
         this.videoEl.onplaying = () => {
-            if (this.playing) {
+            if (this._isPlaying) {
                 this.dispatchEvent(new Event(Events.VIDEO_LOOP, { bubbles: true, composed: true }));
             } else {
-                this.playing = true;
-                clearInterval(this.timer);
+                this._isPlaying = true;
+                clearInterval(this.timer as number);
                 this.timer = window.setInterval(() => {
-                    if (this.loop) {
-                        this.dispatchEvent(new Event(Events.VIDEO_LOOP, { bubbles: true, composed: true }));
-                    } else {
-                        this.pause();
-                        this.onEnded();
-                    }
-
-                    this.dispatchEvent(new Event(Events.TIME_UPDATE, { bubbles: true, composed: true }));
+                    this.onTimerUpdate();
                 }, 100);
                 this.dispatchEvent(new Event(Events.VIDEO_PLAY, { bubbles: true, composed: true }));
             }
         }
+    }
+
+    protected onTimerUpdate() {
+        /*
+            // DOES NOT WORK! Pauses the video no matter what
+            if (this.isLooping) {
+                this.dispatchEvent(new Event(Events.VIDEO_LOOP, { bubbles: true, composed: true }));
+            } else {
+                this.pause();
+                this.onEnded();
+            }
+        */
+        this.updateControls();
+        this.dispatchEvent(new Event(Events.TIME_UPDATE, { bubbles: true, composed: true }));
     }
 
     public pause() {
@@ -161,7 +124,7 @@ export class Video extends HTMLElement {
     }
 
     public togglePlayback() {
-        if (this.playing) {
+        if (this._isPlaying) {
             this.videoEl.pause();
         } else {
             this.videoEl.play();
@@ -188,27 +151,12 @@ export class Video extends HTMLElement {
         this.dispatchEvent(new Event(Events.TIME_UPDATE, { bubbles: true, composed: true }));
     }
 
-    /**
-     * set current time based on percentage through video
-     */
-    public set currentPercent(val) {
-        this.currentTime = (val / 100) * this.duration;
-    }
-
-    /**
-     * get current time based on percentage through video
-     */
-    public get currentPercent() {
-        return (this.currentTime / this.duration) * 100;
-    }
-
     protected onEnded() {
-        clearInterval(this.timer);
+        clearInterval(this.timer as number);
         this.dispatchEvent(new Event(Events.VIDEO_END, {bubbles: true, composed: true }));
     }
 
     protected onMetadata() {
-        this.aspectRatio = (this.videoEl.videoWidth || 1) / (this.videoEl.videoHeight || 1);
         this.resize();
         this.dispatchEvent(new Event(Events.METADATA, { bubbles: true, composed: true }));
     }
@@ -224,6 +172,7 @@ export class Video extends HTMLElement {
     protected async loadCurrentSource() {
         let sourceChange = false;
         if (this.hasAttribute('source')) {
+            // @ts-ignore
             this.videoEl.srcObject = null;
             this.videoEl.src = this.getAttribute('source') || '';
 
@@ -243,9 +192,10 @@ export class Video extends HTMLElement {
                 },
             });
             this.videoEl.srcObject = this.stream;
-            this.videoEl.muted = false;
+            this.videoEl.muted = true;
             sourceChange = true;
         } else if (!this.hasAttribute('camera') && this.videoEl.srcObject) {
+            // @ts-ignore
             this.videoEl.srcObject = null;
             if (this.stream) {
                 this.stream.getTracks()[0].stop();
@@ -273,8 +223,8 @@ export class Video extends HTMLElement {
                 break;
 
             case 'loop':
-                this.loop = this.hasAttribute('loop');
-                this.videoEl.loop = this.loop;
+                this._isLooping = this.hasAttribute('loop');
+                this.videoEl.loop = this._isLooping;
                 break;
 
             default:
@@ -324,7 +274,7 @@ export class Video extends HTMLElement {
     }
 
     protected disconnectedCallback() {
-        clearInterval(this.timer);
+        clearInterval(this.timer as number);
         this.isComponentMounted = false;
         if (this.stream) {
             const tracks = this.stream.getTracks();

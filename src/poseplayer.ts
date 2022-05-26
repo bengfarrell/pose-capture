@@ -1,10 +1,9 @@
 import { Keyframe } from './videopose-element';
-import {AbstractPlayer, AbstractPlayerState, Bounds} from './abstractplayer';
 import { Events } from './events';
 import { AbstractPoseVisualizer } from './abstractvisualizer';
-import { PlaybackEvent } from './playbackevent';
+import {BasePlayer} from "./baseplayer";
 
-export default class PosePlayer extends HTMLElement implements AbstractPlayer {
+export default class PosePlayer extends BasePlayer {
     static get observedAttributes() {
         return ['isLooping', 'posedata']
     }
@@ -18,81 +17,9 @@ export default class PosePlayer extends HTMLElement implements AbstractPlayer {
     protected audio?: HTMLAudioElement;
 
     /**
-     * is video looping?
-     */
-    protected _isLooping: boolean = this.hasAttribute('isLooping');
-
-    public get isLooping() {
-        return this._isLooping;
-    }
-
-    public set isLooping(val: boolean) {
-        this._isLooping = val;
-        if (this._isLooping) {
-            this.setAttribute('isLooping', '');
-        } else {
-            this.removeAttribute('isLooping');
-        }
-    }
-
-    /**
-     * is video playing?
-     */
-    protected _isPlaying: boolean = false;
-
-    public get isPlaying() {
-        return this._isPlaying;
-    }
-
-    /**
-     * video duration
-     */
-    protected _duration: number = 0;
-
-    public get duration() {
-        return this._duration;
-    }
-
-
-    /**
-     * width of component
-     */
-    protected width: number = 0;
-
-    /**
-     * height of component
-     */
-    protected height: number = 0;
-
-    /**
-     * aspect ratio of video
-     */
-    protected aspectRatio: number = 0;
-
-    /**
-     * visible area bounding box
-     */
-    protected visibleMediaRect: Bounds = { x: 0, y: 0, width: 0, height: 0 };
-
-    /**
      * timer for driving playback status
      */
     protected timer?: number;
-
-    public get videoBounds() {
-        return this.visibleMediaRect;
-    }
-
-    /**
-     * get video element's natural size
-     */
-    public get naturalSize() {
-        return {
-            width: 0, //this.videoEl.videoWidth,
-            height: 0, // this.videoEl.videoHeight
-        };
-    }
-
 
     public loadPoseData(uri: string) {
         fetch(uri)
@@ -147,48 +74,6 @@ export default class PosePlayer extends HTMLElement implements AbstractPlayer {
 
         if (this.hasAttribute('posedata')) {
             this.loadPoseData(this.getAttribute('posedata') as string);
-        }
-
-        this.addEventListener(PlaybackEvent.Type, this.handleControlsEvent as any);
-
-        this._isPlaying = false;
-    }
-
-    protected handleControlsEvent(e: PlaybackEvent) {
-        switch (e.action) {
-            case PlaybackEvent.TOGGLE_PLAYBACK:
-                if (this.isPlaying) {
-                    this.pause();
-                } else {
-                    this.play();
-                }
-                this.updateControls();
-                break;
-
-            case PlaybackEvent.LOOP:
-                this.isLooping = !e.state.isLooping;
-                this.updateControls();
-                break;
-
-            case PlaybackEvent.TIMELINE_SCRUB:
-                this.pause();
-                this.currentTime = e.state.currentTime;
-                break;
-        }
-    }
-
-    protected updateControls() {
-        const slot = this.shadowRoot?.querySelector('slot');
-        if (slot) {
-            slot.assignedElements().forEach( (slotted: any) => {
-                const controls: AbstractPlayerState = slotted;
-                if (controls) {
-                    controls.isLooping = this.isLooping;
-                    controls.isPlaying = this.isPlaying;
-                    controls.currentTime = this.currentTime;
-                    controls.duration = this.duration;
-                }
-            });
         }
     }
 
@@ -280,7 +165,7 @@ export default class PosePlayer extends HTMLElement implements AbstractPlayer {
     }
 
     protected onEnded() {
-        clearInterval(this.timer);
+        clearInterval(this.timer as number);
         this.dispatchEvent(new Event(Events.VIDEO_END, {bubbles: true, composed: true }));
     }
 
@@ -302,7 +187,7 @@ export default class PosePlayer extends HTMLElement implements AbstractPlayer {
     }
 
     protected disconnectedCallback() {
-        clearInterval(this.timer);
+        clearInterval(this.timer as number);
     }
 
 }

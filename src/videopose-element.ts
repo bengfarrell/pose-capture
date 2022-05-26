@@ -1,6 +1,7 @@
-import { Video } from "./video-element";
-import { AbstractPoseVisualizer } from "./abstractvisualizer";
-import {Events} from "./events";
+import { Video } from './video-element';
+import { AbstractPoseVisualizer } from './abstractvisualizer';
+import { Events} from './events';
+import { PlaybackEvent } from './playbackevent';
 
 export interface Point {
     name?: string;
@@ -19,16 +20,17 @@ export interface Keyframe {
 export class VideoPoseBase extends Video {
     protected _keyframes: Keyframe[] = [];
 
-    protected recordingOn: boolean = false;
-
     protected hasStarted: boolean = false;
 
     protected audioRecorder?: MediaRecorder;
 
+    protected recordingStartTime?: number;
+
     protected recordedAudio?: Blob;
 
-    public get isRecording(): boolean {
-        return this.recordingOn;
+    constructor() {
+        super();
+        this.addEventListener(PlaybackEvent.Type, this.handleControlsEvent as any);
     }
 
     public get keyframes() {
@@ -77,19 +79,28 @@ export class VideoPoseBase extends Video {
             });
         }
 
-        if (this.recordingOn) {
+        if (this.isRecording) {
             this._keyframes.push(...keyframes);
         }
     }
 
+    protected onTimerUpdate() {
+        if (this.isRecording) {
+            this._recordingDuration = Date.now() - this.recordingStartTime;
+        }
+        super.onTimerUpdate();
+    }
+
     startRecording(includeAudio: boolean = false) {
-        if (this.recordingOn) {
+        if (this.isRecording) {
             return;
         }
-        this.recordingOn = true;
+        this._isRecording = true;
+        this._isAudioRecording = includeAudio;
+        this.recordingStartTime = Date.now();
         this._keyframes = [];
         this.recordedAudio = undefined;
-
+        this.updateControls();
         if (includeAudio) {
             const stream = (this.videoEl as any).captureStream();
 
@@ -108,7 +119,9 @@ export class VideoPoseBase extends Video {
     }
 
     stopRecording() {
-        this.recordingOn = false;
+        this._isRecording = false;
+        this._isAudioRecording = false;
+        this.updateControls();
         if (this.audioRecorder) {
             this.audioRecorder.requestData();
             this.audioRecorder.stop();
@@ -119,5 +132,25 @@ export class VideoPoseBase extends Video {
     protected onEnded() {
         super.onEnded();
         this.stopRecording();
+    }
+
+    protected handleControlsEvent(e: PlaybackEvent) {
+        super.handleControlsEvent(e);
+        switch (e.action) {
+            case PlaybackEvent.TOGGLE_RECORD_POSE:
+                if (!this._isRecording) {
+                  this.startRecording(false);
+                } else {
+                    this.stopRecording();
+                }
+                break;
+
+            case PlaybackEvent.TOGGLE_RECORD_POSE_AND_AUDIO:
+                if (!this._isRecording) {
+                    this.startRecording(true);
+                } else {
+                    this.stopRecording();
+                }
+        }
     }
 }

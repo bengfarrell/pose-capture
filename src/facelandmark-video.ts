@@ -14,7 +14,7 @@ export default class FaceLandmarkVideo extends VideoPoseBase {
 
     async poseDetectionFrame() {
         const maximumFaces: number = this.hasAttribute('maximumFaces') ? Number(this.getAttribute('maximumFaces')) : 1;
-        if (this.playing && this.videoEl.readyState > 1) {
+        if (this.isPlaying && this.videoEl.readyState > 1) {
             const result = await processFrame(this, {
                 maximumFaces,
                 includeMeshPoints: this.hasAttribute('includeMeshPoints') });

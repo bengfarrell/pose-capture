@@ -1,6 +1,8 @@
 import { html, css, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import '../poseplayer';
+// import '../facelandmark-video';
+import '../bodypix-video';
 import '../visualization-canvas';
 import '../ui/playbackcontrols';
 
@@ -13,7 +15,7 @@ export class DemoApp extends LitElement {
           display: inline-block;
         }
       
-        pose-player {
+        #video {
           width: 100%;
           height: 100%;
           display: inline-block;
@@ -22,7 +24,14 @@ export class DemoApp extends LitElement {
     `;
 
     public render() {
-        return html`<pose-player autoplay isLooping posedata="./sampleassets/posedata.json">
+        return html`<bodypix-video id="video" camera>
+            <visualization-canvas dotcolor="#ff0000" dotbackcolor="#000000"></visualization-canvas>
+            <pose-playback-controls></pose-playback-controls>
+        </bodypix-video>`;
+    }
+
+    public renderPosePlayer() {
+        return html`<pose-player id="video" autoplay isLooping posedata="./sampleassets/posedata.json">
             <visualization-canvas dotcolor="#ff0000" dotbackcolor="#000000"></visualization-canvas>
             <pose-playback-controls></pose-playback-controls>
         </pose-player>`;

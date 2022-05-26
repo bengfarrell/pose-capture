@@ -1,11 +1,21 @@
 import { css, html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 
 @customElement('pose-button')
 export class Button extends LitElement {
+    @property({ type: Boolean, reflect: true }) disabled: boolean = false;
+
     static styles = [ css`
       :host {
         display: inline-block;
+      }
+      
+      :host([disabled]) {
+        pointer-events: none;
+      }
+
+      :host([disabled]) button {
+        opacity: .25;
       }
 
       button {
