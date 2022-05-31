@@ -21,14 +21,20 @@ export interface PlayerState {
     isAudioRecording: boolean;
 
     recordingDuration: number;
+
+    playbackRate: number;
 }
 
 export interface Player extends PlayerState {
     get videoBounds(): Bounds;
 
+    get canRecord(): boolean;
+
     pause(): void;
 
     play(): void;
+
+    step(frame: number): void;
 
     togglePlayback(): void;
 
@@ -41,10 +47,32 @@ export class BasePlayer extends HTMLElement implements Player {
         this.addEventListener(PlaybackEvent.Type, this.handleControlsEvent as any);
     }
 
+    public get canRecord() {
+        return false;
+    }
+
+    /**
+     * playback rate
+     */
+    protected _playbackRate: number = this.hasAttribute('playbackRate') ?
+        Number(this.getAttribute('playbackRate')) : 1;
+
+    public get playbackRate() {
+        return this._playbackRate;
+    }
+
+    public set playbackRate(val: number) {
+        this._playbackRate = val;
+        if (this._playbackRate) {
+            this.setAttribute('playbackrate', String(val));
+        }
+        this.changePlaybackRate(val);
+    }
+
     /**
      * is video looping?
      */
-    protected _isLooping: boolean = this.hasAttribute('isLooping');
+    protected _isLooping: boolean = this.hasAttribute('islooping');
 
     public get isLooping() {
         return this._isLooping;
@@ -53,9 +81,9 @@ export class BasePlayer extends HTMLElement implements Player {
     public set isLooping(val: boolean) {
         this._isLooping = val;
         if (this._isLooping) {
-            this.setAttribute('isLooping', '');
+            this.setAttribute('islooping', '');
         } else {
-            this.removeAttribute('isLooping');
+            this.removeAttribute('islooping');
         }
     }
 
@@ -95,7 +123,9 @@ export class BasePlayer extends HTMLElement implements Player {
         return this._currentTime;
     }
 
-    public set currentTime(_val: number) {}
+    public set currentTime(_val: number) {
+        this.seekTo(_val);
+    }
 
     /**
      * video duration
@@ -166,6 +196,12 @@ export class BasePlayer extends HTMLElement implements Player {
 
     public togglePlayback() {}
 
+    public step(_frame: number) {}
+
+    protected seekTo(_ms: number) {}
+
+    protected changePlaybackRate(_rate: number) {}
+
     protected updateControls() {
         const slot = this.shadowRoot?.querySelector('slot');
         if (slot) {
@@ -179,6 +215,7 @@ export class BasePlayer extends HTMLElement implements Player {
                     controls.recordingDuration = this.recordingDuration;
                     controls.isRecording = this.isRecording;
                     controls.isAudioRecording = this.isAudioRecording;
+                    controls.playbackRate = this.playbackRate;
                 }
             });
         }
@@ -200,9 +237,22 @@ export class BasePlayer extends HTMLElement implements Player {
                 this.updateControls();
                 break;
 
-            case PlaybackEvent.TIMELINE_SCRUB:
+            case PlaybackEvent.STEP_FORWARD:
                 this.pause();
+                this.step(1);
+                break;
+
+            case PlaybackEvent.STEP_BACKWARD:
+                this.pause();
+                this.step(-1);
+                break;
+
+            case PlaybackEvent.TIMELINE_SCRUB:
                 this.currentTime = e.state.currentTime;
+                break;
+
+            case PlaybackEvent.PLAYBACK_RATE_UPDATE:
+                this.playbackRate = e.state.playbackRate;
                 break;
         }
     }

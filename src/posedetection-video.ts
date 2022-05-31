@@ -9,9 +9,10 @@ export default class PoseDetectionVideo extends VideoPoseBase {
     }
 
     async poseDetectionFrame() {
-        if (this.isPlaying && this.videoEl.readyState > 1) {
+        if ((this.isPlaying || this.forceOneTimePoseProcess) && this.videoEl.readyState > 1) {
             const result = await processFrame(this);
             this.onPoseFrame(result);
+            this.forceOneTimePoseProcess = false;
         }
         requestAnimationFrame( () => this.poseDetectionFrame());
     }

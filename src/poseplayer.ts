@@ -94,7 +94,7 @@ export default class PosePlayer extends BasePlayer {
         this._isPlaying = true;
         this.playStartTime = Date.now();
 
-        // this.audio?.play();
+        this.audio?.play();
 
         if (this.audio) {
             this.audio.loop = this.isLooping;

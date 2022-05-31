@@ -2,8 +2,9 @@ import { Events } from './events';
 import { BasePlayer } from "./baseplayer";
 
 export class Video extends BasePlayer {
+
     static get observedAttributes() {
-        return ['camera', 'source', 'loop']
+        return ['camera', 'source', 'islooping', 'playbackrate']
     }
 
     /**
@@ -31,6 +32,10 @@ export class Video extends BasePlayer {
      */
     public get videoElement() {
         return this.videoEl;
+    }
+
+    public get canRecord() {
+        return true;
     }
 
     constructor() {
@@ -92,6 +97,7 @@ export class Video extends BasePlayer {
                 this.dispatchEvent(new Event(Events.VIDEO_LOOP, { bubbles: true, composed: true }));
             } else {
                 this._isPlaying = true;
+                this.videoEl.playbackRate = this._playbackRate;
                 clearInterval(this.timer as number);
                 this.timer = window.setInterval(() => {
                     this.onTimerUpdate();
@@ -111,6 +117,7 @@ export class Video extends BasePlayer {
                 this.onEnded();
             }
         */
+        this._currentTime = this.videoEl.currentTime * 1000;
         this.updateControls();
         this.dispatchEvent(new Event(Events.TIME_UPDATE, { bubbles: true, composed: true }));
     }
@@ -124,11 +131,24 @@ export class Video extends BasePlayer {
     }
 
     public togglePlayback() {
-        if (this._isPlaying) {
-            this.videoEl.pause();
+        if (this.isPlaying) {
+            this.pause();
         } else {
-            this.videoEl.play();
+            this.play();
         }
+    }
+
+    public step(frames: number) {
+        this.pause();
+        this.videoEl.currentTime += .1 * frames;
+    }
+
+    protected seekTo(val: number) {
+        this.videoEl.currentTime = val / 1000;
+    }
+
+    protected changePlaybackRate(rate: number) {
+        this.videoEl.playbackRate = rate;
     }
 
     public get source() {
@@ -142,15 +162,6 @@ export class Video extends BasePlayer {
         this.videoEl.src = val;
     }
 
-    public get currentTime() {
-        return this.videoEl.currentTime || 0;
-    }
-
-    public set currentTime(val) {
-        this.videoEl.currentTime = val;
-        this.dispatchEvent(new Event(Events.TIME_UPDATE, { bubbles: true, composed: true }));
-    }
-
     protected onEnded() {
         clearInterval(this.timer as number);
         this.dispatchEvent(new Event(Events.VIDEO_END, {bubbles: true, composed: true }));
@@ -159,6 +170,8 @@ export class Video extends BasePlayer {
     protected onMetadata() {
         this.resize();
         this.dispatchEvent(new Event(Events.METADATA, { bubbles: true, composed: true }));
+        this._duration = this.videoEl.duration * 1000;
+        this.updateControls();
     }
 
     protected connectedCallback() {
@@ -222,9 +235,14 @@ export class Video extends BasePlayer {
                 }
                 break;
 
-            case 'loop':
-                this._isLooping = this.hasAttribute('loop');
+            case 'islooping':
+                this._isLooping = this.hasAttribute('islooping');
                 this.videoEl.loop = this._isLooping;
+                break;
+
+            case 'playbackrate':
+                this._playbackRate = Number(this.getAttribute('playbackRate'));
+                this.videoEl.playbackRate = this.playbackRate;
                 break;
 
             default:

@@ -26,6 +26,8 @@ export class VideoPoseBase extends Video {
 
     protected audioData?: string;
 
+    protected forceOneTimePoseProcess: boolean = false;
+
     protected recordingStartTime?: number;
 
     protected recordedAudio?: Blob;
@@ -47,31 +49,9 @@ export class VideoPoseBase extends Video {
         }
     }
 
-    public saveRecording() {
-        const link = document.createElement('a');
-
-        if (this.recordedAudio) {
-            const reader = new FileReader();
-            reader.readAsDataURL(this.recordedAudio);
-            new Promise(() => {
-                reader.onloadend = () => {
-                    const data = `data:text/json;charset=utf-8,${
-                        encodeURIComponent( JSON.stringify({
-                            keyframes: this.keyframes,
-                            audio: (reader.result as string).replace('application/octet-stream', 'audio/webm') }))}`;
-                    link.setAttribute('download', 'posedata.json');
-                    link.setAttribute('href', data);
-                    link.click();
-                };
-            });
-        } else {
-            const data = `data:text/json;charset=utf-8,${
-                encodeURIComponent( JSON.stringify({
-                    keyframes: this.keyframes }))}`;
-            link.setAttribute('download', 'posedata.json');
-            link.setAttribute('href', data);
-            link.click();
-        }
+    public step(frames: number) {
+        super.step(frames);
+        this.forceOneTimePoseProcess = true;
     }
 
     protected onPoseFrame(keyframes: Keyframe[]) {
@@ -129,7 +109,6 @@ export class VideoPoseBase extends Video {
                         new Promise(() => {
                             reader.onloadend = () => {
                                 this.audioData = (reader.result as string).replace('application/octet-stream', 'audio/webm');
-                                console.log(this.recording);
                             };
                         });
                     }
@@ -152,6 +131,7 @@ export class VideoPoseBase extends Video {
             this.audioRecorder.stop();
             this.audioRecorder = undefined;
         }
+        this.dispatchEvent(new Event(Events.END_RECORDING, { bubbles: true, composed: true }));
     }
 
     protected onEnded() {

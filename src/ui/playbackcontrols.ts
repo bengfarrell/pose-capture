@@ -1,7 +1,7 @@
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { PlaybackEvent } from '../playbackevent';
-import { LOOP, RECORD, RECORD_AUDIO } from "./icons";
+import { LOOP, RECORD, RECORD_AUDIO, STEP_FORWARD, STEP_BACK } from "./icons";
 import './play-button';
 import './toggle-button';
 import './timeline';
@@ -24,6 +24,8 @@ export class PlaybackControls extends LitElement implements PlayerState {
 
     @property({ type: Boolean, reflect: true }) recordingDuration: number = -1;
 
+    @property({ type: Number, reflect: true }) playbackRate: number = 1;
+
     static styles = css`
       :host {
         background-color: #5f6773;
@@ -36,16 +38,17 @@ export class PlaybackControls extends LitElement implements PlayerState {
         bottom: 0;
       }
 
-      span {
+      span.time,
+      span.recording-time {
         filter: drop-shadow(1px 3px .5px rgb(50, 55, 58));
+        padding-left: 10px;
+        padding-right: 10px;
       }
 
       .divider {
         height: 66%;
         width: 1px;
         background-color: #8292a2;
-        margin-left: 5px;
-        margin-right: 5px;
       }
 
       .control {
@@ -63,7 +66,7 @@ export class PlaybackControls extends LitElement implements PlayerState {
       }
 
       pose-timeline {
-        width: 200px;
+        flex: 1;
         height: 100%;
       }
     `;
@@ -91,8 +94,15 @@ export class PlaybackControls extends LitElement implements PlayerState {
                         @click=${() => this.doAction(PlaybackEvent.TOGGLE_PLAYBACK)}>
                     </pose-play-button>
                     <div class="divider"></div>
+                    <pose-button @click=${() => this.doAction(PlaybackEvent.STEP_FORWARD)}>${STEP_FORWARD}</pose-button>
+                    <div class="divider"></div>
+                    <pose-button @click=${() => this.doAction(PlaybackEvent.STEP_BACKWARD)}>${STEP_BACK}</pose-button>
+                    <div class="divider"></div>
+                    ${this.renderRecordingControls()}
+                    
+                    ${!this.isRecording ? html`
                     <pose-timeline 
-                        class="control" 
+                        class="control"
                         @scrub=${(e: Event) => {
                             this.currentTime = ((e.target as Timeline).scrubProgress / 100) * this.duration;
                             this.doAction(PlaybackEvent.TIMELINE_SCRUB);
@@ -100,17 +110,35 @@ export class PlaybackControls extends LitElement implements PlayerState {
                         progress=${(this.currentTime / this.duration) * 100}>
                     </pose-timeline>
                     <div class="divider"></div>
-                    <span>${PlaybackControls.formatTime(this.currentTime)} / ${PlaybackControls.formatTime(this.duration)}</span>
+                    <span class="time">${PlaybackControls.formatTime(this.currentTime)} / ${PlaybackControls.formatTime(this.duration)}</span>
                     <div class="divider"></div>
                     <pose-toggle-button 
                         class="control"
                         @click=${() => this.doAction(PlaybackEvent.LOOP)}
                         ?active=${this.isLooping}>
                         ${LOOP}
-                    </pose-toggle-button>`;
+                    </pose-toggle-button>
+                    <div class="divider"></div>
+                    <pose-toggle-button
+                            class="control"
+                            @click=${() => {
+                                if (this.playbackRate === 1) {
+                                    this.playbackRate = .1;
+                                } else {
+                                    this.playbackRate = 1;
+                                }
+                                this.doAction(PlaybackEvent.PLAYBACK_RATE_UPDATE);
+                            }}
+                            ?active=${this.playbackRate === .1}>
+                        .1x
+                    </pose-toggle-button>` : undefined}`;
     }
 
-    public renderLiveMode() {
+    protected renderLiveMode() {
+        return this.renderRecordingControls();
+    }
+
+    protected renderRecordingControls() {
         return html`<pose-toggle-button
                 class="control record"
                 ?disabled=${this.isAudioRecording}
@@ -128,7 +156,7 @@ export class PlaybackControls extends LitElement implements PlayerState {
         </pose-toggle-button>
         <div class="divider"></div>
         
-        ${this.recordingDuration > -1 ? html`
+        ${this.isRecording && this.recordingDuration > -1 ? html`
         <span class="recording-time">${PlaybackControls.formatTime(this.recordingDuration)}</span>
         <div class="divider"></div>` : undefined}`;
     }

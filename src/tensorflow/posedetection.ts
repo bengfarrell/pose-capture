@@ -20,14 +20,12 @@ export const processFrame = async (source: VideoPoseBase) => {
         const poses = await detector.estimatePoses(source.videoElement);
         if (poses) {
             poses.forEach((pose: Pose, index: number) => {
-                const max = [-Infinity, -Infinity, -Infinity];
-                const min = [Infinity, Infinity, Infinity];
                 const keyframe: Keyframe = {
                     time: Date.now(),
                     score: pose.score,
                     pose: index,
                     points: [],
-                    bounds: {}
+                    aspectRatio: source.aspectRatio
                 }
                 pose.keypoints?.forEach((keypoint: Keypoint) => {
                     keyframe.points.push({

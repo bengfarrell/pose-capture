@@ -7,11 +7,17 @@ export class PlaybackEvent extends Event {
 
     public static PLAYBACK_TIME_UPDATE = 'onPlaybackTimeUpdate';
 
+    public static PLAYBACK_RATE_UPDATE = 'onPlaybackRateUpdate';
+
     public static TIMELINE_SCRUB = 'onTimelineScrub';
 
     public static TOGGLE_RECORD_POSE = 'onRecordPose';
 
     public static TOGGLE_RECORD_POSE_AND_AUDIO = 'onRecordPoseAndAudio';
+
+    public static STEP_FORWARD = 'onStepForward';
+
+    public static STEP_BACKWARD = 'onStepBackward';
 
     public static LOOP = 'onLoopChange';
 
@@ -33,7 +39,8 @@ export class PlaybackEvent extends Event {
             isPlaying: state.isPlaying,
             isRecording: state.isRecording,
             isAudioRecording: state.isAudioRecording,
-            recordingDuration: state.recordingDuration
+            recordingDuration: state.recordingDuration,
+            playbackRate: state.playbackRate
         }
     }
 }

@@ -8,6 +8,8 @@ export class Button extends LitElement {
     static styles = [ css`
       :host {
         display: inline-block;
+        padding-left: 3px;
+        padding-right: 3px;
       }
       
       :host([disabled]) {
@@ -28,7 +30,7 @@ export class Button extends LitElement {
       }
 
       button:hover {
-        background-color: rgba(0, 0, 0, 0.25);
+        background-color: rgba(0, 0, 0, 0.1);
       }
 
       button svg,

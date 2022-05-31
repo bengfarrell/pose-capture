@@ -25,7 +25,7 @@
     "@types/dom-mediacapture-record": "^1.0.11",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
-    "@web/dev-server": "^0.1.29",
+    "@web/dev-server": "^0.1.31",
     "eslint": "^8.8.0",
     "koa-range": "^0.3.0",
     "prettier": "^2.5.1",

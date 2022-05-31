@@ -5,6 +5,7 @@ import '../poseplayer';
 import '../bodypix-video';
 import '../visualization-canvas';
 import '../ui/playbackcontrols';
+import {VideoPoseBase} from "../videopose-element";
 
 @customElement('pose-demo-app')
 export class DemoApp extends LitElement {
@@ -23,8 +24,23 @@ export class DemoApp extends LitElement {
         }
     `;
 
+    protected onRecordingFinished(e: Event) {
+        console.log((e.target as VideoPoseBase).recording)
+        const link = document.createElement('a');
+        const data = `data:text/json;charset=utf-8,${
+            encodeURIComponent( JSON.stringify(
+                (e.target as VideoPoseBase).recording)
+            )}`;
+        link.setAttribute('download', 'posedata.json');
+        link.setAttribute('href', data);
+        link.click();
+    }
+
     public render() {
-        return html`<bodypix-video id="video" camera>
+        return html`
+            <bodypix-video 
+                id="video" xcamera source="./sampleassets/conan.mp4" 
+                @endrecording=${this.onRecordingFinished}>
             <visualization-canvas dotcolor="#ff0000" dotbackcolor="#000000"></visualization-canvas>
             <pose-playback-controls></pose-playback-controls>
         </bodypix-video>`;

@@ -1,19 +1,19 @@
-export class Events {
-    static get VIDEO_END() { return 'onvideoend'; }
+export const Events = {
+    VIDEO_END: 'videoend',
 
-    static get VIDEO_PAUSE() { return 'onvideopause'; }
+    VIDEO_PAUSE: 'videopause',
 
-    static get VIDEO_PLAY() { return 'onvideoplay'; }
+    VIDEO_PLAY: 'videoplay',
 
-    static get VIDEO_LOOP() { return 'onvideoloop'; }
+    VIDEO_LOOP: 'videoloop',
 
-    static get VIDEO_SOURCE_CHANGED() { return 'onvideosourcechanged'; }
+    VIDEO_SOURCE_CHANGED: 'videosourcechanged',
 
-    static get TIME_UPDATE() { return 'onvideotimeupdate'; }
+    TIME_UPDATE: 'videotimeupdate',
 
-    static get METADATA() { return 'onvideometadata'; }
+    METADATA: 'videometadata',
 
-    static get POSE_TRACKING_STARTED() { return 'onPoseTrackingStarted'; }
+    POSE_TRACKING_STARTED: 'startposetracking',
 
-    static get POSE_CAPTURE_FINISHED_EVENT() { return 'capturefinished'; }
+    END_RECORDING: 'endrecording'
 }

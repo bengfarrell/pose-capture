@@ -54,10 +54,8 @@ export class Timeline extends LitElement {
     }
 
     public render() {
-        return html`<div id="container">
-            <div id="progress" 
-                 @pointerdown=${this.handlePointerDown}
-                 style="width: ${this.scrubProgress >= 0 ? this.scrubProgress : this.progress}%">
+        return html`<div id="container" @pointerdown=${this.handlePointerDown}>
+            <div id="progress" style="width: ${this.scrubProgress >= 0 ? this.scrubProgress : this.progress}%">
             </div>
         </div>`;
     }

@@ -29,8 +29,6 @@ export const processFrame = async (source: VideoPoseBase, recordingStartTime: nu
         for (let p = 0; p < numPredictions; p++) {
             const prediction = predictions[p];
             const mesh: number[][] = (prediction.scaledMesh as number[][]).slice();
-            const max = [-Infinity, -Infinity, -Infinity];
-            const min = [Infinity, Infinity, Infinity];
             const keyframe: Keyframe = {
                 time: Date.now() - recordingStartTime,
                 pose: p,

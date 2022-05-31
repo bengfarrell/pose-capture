@@ -63,8 +63,10 @@ export class VisualizationCanvas extends HTMLElement implements AbstractPoseVisu
                 frame.points.forEach((point: Point) => {
                     const centerX = point.position[0] * (this.canvas?.width || 0);
                     const centerY = point.position[1] * (this.canvas?.height || 0);
-                    if (frame.bounds.maxZ && frame.bounds.minZ && this.dotBackColor) {
-                        const depthRange = frame.bounds.maxZ - frame.bounds.minZ;
+
+                    // Maybe make the below range configurable?
+                    if (/*frame.bounds.maxZ && frame.bounds.minZ &&*/ this.dotBackColor) {
+                        const depthRange = 1; // frame.bounds.maxZ - frame.bounds.minZ;
                         const colordiff = ( point.position[2] / depthRange );
                         const color = VisualizationCanvas.InterpolateColor(this.dotColor, this.dotBackColor, colordiff);
                         if (this.canvasContext) {
