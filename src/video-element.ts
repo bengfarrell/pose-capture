@@ -140,7 +140,8 @@ export class Video extends BasePlayer {
 
     public step(frames: number) {
         this.pause();
-        this.videoEl.currentTime += .1 * frames;
+        // hard coded step value based on 24fps
+        this.videoEl.currentTime += .04166 * frames;
     }
 
     protected seekTo(val: number) {

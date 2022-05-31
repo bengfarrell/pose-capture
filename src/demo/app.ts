@@ -6,6 +6,7 @@ import '../bodypix-video';
 import '../visualization-canvas';
 import '../ui/playbackcontrols';
 import {VideoPoseBase} from "../videopose-element";
+import '../video-element';
 
 @customElement('pose-demo-app')
 export class DemoApp extends LitElement {
@@ -37,13 +38,16 @@ export class DemoApp extends LitElement {
     }
 
     public render() {
-        return html`
-            <bodypix-video 
-                id="video" xcamera source="./sampleassets/conan.mp4" 
+        return html`<video-base id="video" source="./sampleassets/timecode.mp4">
+            <pose-playback-controls></pose-playback-controls>
+        </video-base>`;
+        /* return html`
+            <bodypix-video
+                id="video" xcamera source="./sampleassets/conan.mp4"
                 @endrecording=${this.onRecordingFinished}>
             <visualization-canvas dotcolor="#ff0000" dotbackcolor="#000000"></visualization-canvas>
             <pose-playback-controls></pose-playback-controls>
-        </bodypix-video>`;
+        </bodypix-video>`; */
     }
 
     public renderPosePlayer() {
