@@ -131,7 +131,6 @@ export class VideoPoseBase extends Video {
 
         this.updateControls();
         if (this.audioRecorder) {
-            this.audioRecorder.requestData();
             this.audioRecorder.stop();
             this.audioRecorder = undefined;
         } else {
