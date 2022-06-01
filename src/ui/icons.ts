@@ -28,13 +28,13 @@ export const RECORD_AUDIO = svg`<svg width="700pt" height="700pt" version="1.1" 
 </svg>`;
 
 // Step Next by Ranah Pixel Studio from NounProject.com
-export const STEP_FORWARD = svg`<svg width="700pt" height="700pt" version="1.1" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg">
+export const STEP_FORWARD = svg`<svg transform="translate(0, 2)" width="700pt" height="700pt" version="1.1" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg">
     <path d="m227.05 87.426v385.03c-0.011719 13.48 14.574 21.914 26.25 15.176l333.41-192.51c11.672-6.7344 11.672-23.582 0-30.32l-333.41-192.51c-10.891-6.2891-26.246 0.94141-26.246 15.141z"/>
     <path d="m122.05 70h35c9.6953 0 17.5 7.8047 17.5 17.5v385c0 9.6953-7.8047 17.5-17.5 17.5h-35c-9.6953 0-17.5-7.8047-17.5-17.5v-385c0-9.6953 7.8047-17.5 17.5-17.5z"/>
  </svg>`;
 
 // Step Next by Ranah Pixel Studio from NounProject.com (flipped)
-export const STEP_BACK = svg`<svg transform="scale(-1, 1)" width="700pt" height="700pt" version="1.1" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg">
+export const STEP_BACK = svg`<svg transform="scale(-1, 1) translate(0, 2)" width="700pt" height="700pt" version="1.1" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg">
     <path d="m227.05 87.426v385.03c-0.011719 13.48 14.574 21.914 26.25 15.176l333.41-192.51c11.672-6.7344 11.672-23.582 0-30.32l-333.41-192.51c-10.891-6.2891-26.246 0.94141-26.246 15.141z"/>
     <path d="m122.05 70h35c9.6953 0 17.5 7.8047 17.5 17.5v385c0 9.6953-7.8047 17.5-17.5 17.5h-35c-9.6953 0-17.5-7.8047-17.5-17.5v-385c0-9.6953 7.8047-17.5 17.5-17.5z"/>
  </svg>`;

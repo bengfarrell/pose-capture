@@ -88,15 +88,16 @@ export class PlaybackControls extends LitElement implements PlayerState {
     }
 
     public renderNonLiveMode() {
-        return html`<pose-play-button 
+        return html`<pose-button ?disabled=${this.isRecording} @click=${() => this.doAction(PlaybackEvent.STEP_FORWARD)}>${STEP_FORWARD}</pose-button>
+                    <div class="divider"></div>
+                    <pose-play-button 
                         class="control" 
+                        ?disabled=${this.isRecording}
                         ?playing=${this.isPlaying}
                         @click=${() => this.doAction(PlaybackEvent.TOGGLE_PLAYBACK)}>
                     </pose-play-button>
                     <div class="divider"></div>
-                    <pose-button @click=${() => this.doAction(PlaybackEvent.STEP_FORWARD)}>${STEP_FORWARD}</pose-button>
-                    <div class="divider"></div>
-                    <pose-button @click=${() => this.doAction(PlaybackEvent.STEP_BACKWARD)}>${STEP_BACK}</pose-button>
+                    <pose-button ?disabled=${this.isRecording} @click=${() => this.doAction(PlaybackEvent.STEP_BACKWARD)}>${STEP_BACK}</pose-button>
                     <div class="divider"></div>
                     ${this.renderRecordingControls()}
                     

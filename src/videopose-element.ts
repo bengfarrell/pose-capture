@@ -85,6 +85,9 @@ export class VideoPoseBase extends Video {
         if (this.isRecording) {
             return;
         }
+        if (!this.isPlaying) {
+            this.play();
+        }
         this._isRecording = true;
         this._isAudioRecording = includeAudio;
         this.recordingStartTime = Date.now();
@@ -109,6 +112,7 @@ export class VideoPoseBase extends Video {
                         new Promise(() => {
                             reader.onloadend = () => {
                                 this.audioData = (reader.result as string).replace('application/octet-stream', 'audio/webm');
+                                this.dispatchEvent(new Event(Events.END_RECORDING, { bubbles: true, composed: true }));
                             };
                         });
                     }
@@ -130,8 +134,9 @@ export class VideoPoseBase extends Video {
             this.audioRecorder.requestData();
             this.audioRecorder.stop();
             this.audioRecorder = undefined;
+        } else {
+            this.dispatchEvent(new Event(Events.END_RECORDING, { bubbles: true, composed: true }));
         }
-        this.dispatchEvent(new Event(Events.END_RECORDING, { bubbles: true, composed: true }));
     }
 
     protected onEnded() {
