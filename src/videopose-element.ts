@@ -17,6 +17,12 @@ export interface Keyframe {
     points: Point[];
 }
 
+export interface PoseRecording {
+    keyframes: Keyframe[],
+    audio?: string,
+    duration: number
+}
+
 export class VideoPoseBase extends Video {
     protected _keyframes: Keyframe[] = [];
 
@@ -41,7 +47,7 @@ export class VideoPoseBase extends Video {
         return this._keyframes.slice();
     }
 
-    public get recording() {
+    public get recording(): PoseRecording {
         return {
             keyframes: this.keyframes,
             audio: this.audioData,

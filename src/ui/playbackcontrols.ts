@@ -6,7 +6,7 @@ import './play-button';
 import './toggle-button';
 import './timeline';
 import {Timeline} from "./timeline";
-import {PlayerState} from "../baseplayer";
+import {BasePlayer, PlayerState} from "../baseplayer";
 
 @customElement('pose-playback-controls')
 export class PlaybackControls extends LitElement implements PlayerState {
@@ -25,6 +25,8 @@ export class PlaybackControls extends LitElement implements PlayerState {
     @property({ type: Boolean, reflect: true }) recordingDuration: number = -1;
 
     @property({ type: Number, reflect: true }) playbackRate: number = 1;
+
+    @property({ type: Number, reflect: true }) canRecord: boolean = false;
 
     static styles = css`
       :host {
@@ -80,7 +82,7 @@ export class PlaybackControls extends LitElement implements PlayerState {
     }
 
     public render() {
-        if (this.duration === 0) {
+        if (this.duration === Infinity || this.duration === 0) {
             return this.renderLiveMode();
         } else {
             return this.renderNonLiveMode();
@@ -111,7 +113,7 @@ export class PlaybackControls extends LitElement implements PlayerState {
                         progress=${(this.currentTime / this.duration) * 100}>
                     </pose-timeline>
                     <div class="divider"></div>
-                    <span class="time">${PlaybackControls.formatTime(this.currentTime)} / ${PlaybackControls.formatTime(this.duration)}</span>
+                    <span class="time">${BasePlayer.formatTime(this.currentTime)} / ${BasePlayer.formatTime(this.duration)}</span>
                     <div class="divider"></div>
                     <pose-toggle-button 
                         class="control"
@@ -140,6 +142,9 @@ export class PlaybackControls extends LitElement implements PlayerState {
     }
 
     protected renderRecordingControls() {
+        if (!this.canRecord) {
+            return undefined;
+        }
         return html`<pose-toggle-button
                 class="control record"
                 ?disabled=${this.isAudioRecording}
@@ -158,17 +163,7 @@ export class PlaybackControls extends LitElement implements PlayerState {
         <div class="divider"></div>
         
         ${this.isRecording && this.recordingDuration > -1 ? html`
-        <span class="recording-time">${PlaybackControls.formatTime(this.recordingDuration)}</span>
+        <span class="recording-time">${BasePlayer.formatTime(this.recordingDuration)}</span>
         <div class="divider"></div>` : undefined}`;
-    }
-
-    public static formatTime(ms: number | undefined) {
-        if (ms) {
-            const seconds = Math.floor(ms / 1000);
-            const minutes = Math.floor(seconds / 60);
-            return `${minutes.toString().length === 2 ? minutes.toString() : '0' + minutes.toString()}:${(seconds % 60).toString().length === 2 ? (seconds % 60).toString() : '0' + (seconds % 60).toString()}`;
-        } else {
-            return '00:00';
-        }
     }
 }

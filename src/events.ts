@@ -15,5 +15,7 @@ export const Events = {
 
     POSE_TRACKING_STARTED: 'startposetracking',
 
-    END_RECORDING: 'endrecording'
+    END_RECORDING: 'endrecording',
+
+    READY: 'ready'
 }

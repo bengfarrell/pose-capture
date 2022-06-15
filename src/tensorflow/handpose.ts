@@ -41,6 +41,5 @@ export const processFrame = async (source: VideoPoseBase, recordingStartTime: nu
             keyframes.push(keyframe);
         });
     }
-    console.log(keyframes)
     return keyframes;
 }

@@ -1,4 +1,4 @@
-import { Keyframe } from './videopose-element';
+import {Keyframe, PoseRecording} from './videopose-element';
 import { Events } from './events';
 import { AbstractPoseVisualizer } from './abstractvisualizer';
 import {BasePlayer} from "./baseplayer";
@@ -21,31 +21,36 @@ export default class PosePlayer extends BasePlayer {
      */
     protected timer?: number;
 
+    public set recording(rec: PoseRecording) {
+        console.log('set recording', rec)
+        this.keyframes = rec.keyframes;
+        // temporarily massage times such that we start with 0
+        const firstKeyTime = rec.keyframes[0].time;
+        this.keyframes.forEach((keyframe: Keyframe) => {
+            keyframe.time -= firstKeyTime;
+        }) ;
+
+        if (rec.audio) {
+            this.audio = new Audio(rec.audio);
+        }
+
+        this._duration = this.keyframes[this.keyframes.length - 1].time;
+        this.updateControls();
+
+        if (this.hasAttribute('autoplay')) {
+            this.play();
+        } else {
+            this.renderPose();
+        }
+    }
+
     public loadPoseData(uri: string) {
         fetch(uri)
             .then((response) => {
                 return response.json()
             })
             .then((json) => {
-                this.keyframes = json.keyframes;
-                // temporarily massage times such that we start with 0
-                const firstKeyTime = json.keyframes[0].time;
-                this.keyframes.forEach((keyframe: Keyframe) => {
-                    keyframe.time -= firstKeyTime;
-                }) ;
-
-                if (json.audio) {
-                    this.audio = new Audio(json.audio);
-                }
-
-                this._duration = this.keyframes[this.keyframes.length - 1].time;
-                this.updateControls();
-
-                if (this.hasAttribute('autoplay')) {
-                    this.play();
-                } else {
-                    this.renderPose();
-                }
+               this.recording = json;
             }).catch(function() {
             console.warn(`Error, ${uri} cannot be found`);
         });
@@ -85,6 +90,17 @@ export default class PosePlayer extends BasePlayer {
         }
     }
 
+    public step(frame: number) {
+        this.currentKeyframe += frame;
+        if (this.currentKeyframe < 0) {
+            this.currentKeyframe = 0;
+        }
+        if (this.currentKeyframe > this.keyframes.length - 1) {
+            this.currentKeyframe = this.keyframes.length - 1;
+        }
+        this.renderPose();
+    }
+
     public pause() {
         this.audio?.pause();
         this._isPlaying = false;
@@ -116,7 +132,7 @@ export default class PosePlayer extends BasePlayer {
                 return;
             }
         }
-        this._currentTime = Date.now() - this.playStartTime;
+        this._currentTime = (Date.now() - this.playStartTime) * this._playbackRate;
         const next: Keyframe = this.keyframes[this.currentKeyframe + 1];
         if (this.currentTime > next.time) {
             this.currentKeyframe ++;
@@ -155,12 +171,31 @@ export default class PosePlayer extends BasePlayer {
         if (this.audio) {
             this.audio.currentTime = val;
         }
-        for (let c = 0; c < this.keyframes.length; c++) {
-            if (this.keyframes[c].time > this.currentTime) {
-                this.currentKeyframe = c;
-                this.renderPose();
-                break;
-            }
+
+        if (this.keyframes.length > 0) {
+            this.currentKeyframe = this.findNearestKeyframe(this._currentTime, this.keyframes);
+            this.renderPose();
+        }
+    }
+
+    protected findNearestKeyframe(time: number, keyframes: Keyframe[], _range?: number[]): number {
+        if (keyframes.length === 1) {
+            return 0;
+        }
+
+        let range = _range ? [_range[0], _range[1]] : [ 0, keyframes.length-1 ];
+        if (range[1] - range[0] <= 1) {
+            return keyframes[range[1]].time - time < time - keyframes[range[0]].time ? range[1] : range[0];
+        }
+
+        const lower = range[0];
+        const mid = range[0] + Math.floor((range[1] - range[0]) / 2);
+        const upper = range[1];
+        if (time > keyframes[lower].time &&
+            time < keyframes[mid].time) {
+            return this.findNearestKeyframe(time, keyframes, [lower, mid]);
+        } else {
+            return this.findNearestKeyframe(time, keyframes, [mid, upper]);
         }
     }
 

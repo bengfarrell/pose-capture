@@ -176,6 +176,7 @@ export class Video extends BasePlayer {
     }
 
     protected connectedCallback() {
+        super.connectedCallback();
         this.classList.toggle('connected', true );
         this.isComponentMounted = true;
         // delay loading giving plenty of time to resize and get settled

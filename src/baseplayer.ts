@@ -1,4 +1,5 @@
-import {PlaybackEvent} from "./playbackevent";
+import {PlaybackEvent} from './playbackevent';
+import {Events} from './events';
 
 export interface Bounds {
     x: number;
@@ -17,6 +18,8 @@ export interface PlayerState {
     isPlaying: boolean;
 
     isRecording: boolean,
+
+    canRecord: boolean,
 
     isAudioRecording: boolean;
 
@@ -45,6 +48,10 @@ export class BasePlayer extends HTMLElement implements Player {
     constructor() {
         super();
         this.addEventListener(PlaybackEvent.Type, this.handleControlsEvent as any);
+    }
+
+    protected connectedCallback() {
+        this.dispatchEvent(new Event(Events.READY, { composed: true, bubbles: true } ));
     }
 
     public get canRecord() {
@@ -216,6 +223,7 @@ export class BasePlayer extends HTMLElement implements Player {
                     controls.isRecording = this.isRecording;
                     controls.isAudioRecording = this.isAudioRecording;
                     controls.playbackRate = this.playbackRate;
+                    controls.canRecord = this.canRecord;
                 }
             });
         }
@@ -254,6 +262,16 @@ export class BasePlayer extends HTMLElement implements Player {
             case PlaybackEvent.PLAYBACK_RATE_UPDATE:
                 this.playbackRate = e.state.playbackRate;
                 break;
+        }
+    }
+
+    public static formatTime(ms: number | undefined) {
+        if (ms) {
+            const seconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(seconds / 60);
+            return `${minutes.toString().length === 2 ? minutes.toString() : '0' + minutes.toString()}:${(seconds % 60).toString().length === 2 ? (seconds % 60).toString() : '0' + (seconds % 60).toString()}`;
+        } else {
+            return '00:00';
         }
     }
 }

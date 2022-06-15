@@ -9,7 +9,6 @@ module.exports = {
     port: 8080,
     watch: true,
     nodeResolve: true,
-    // http2: true,
     preserveSymlinks: true,
     middlewares: [ range ],
     plugins: [

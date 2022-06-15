@@ -40,7 +40,8 @@ export class PlaybackEvent extends Event {
             isRecording: state.isRecording,
             isAudioRecording: state.isAudioRecording,
             recordingDuration: state.recordingDuration,
-            playbackRate: state.playbackRate
+            playbackRate: state.playbackRate,
+            canRecord: state.canRecord
         }
     }
 }
