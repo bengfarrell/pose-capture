@@ -20,7 +20,9 @@ export const load = async function() {
     });
 }
 
-export const processFrame = async function (source: VideoPoseBase, recordingStartTime: number) {
+export const parts = bodypix.PART_CHANNELS;
+
+export const processFrame = async function (source: VideoPoseBase, recordingStartTime = 0, minConfidence = 0) {
     const keyframes: Keyframe[] = [];
     if (model) {
         const parts = await model.segmentPersonParts(source.videoElement, {
@@ -41,14 +43,16 @@ export const processFrame = async function (source: VideoPoseBase, recordingStar
                     aspectRatio: source.aspectRatio
                 }
                 pose.keypoints.forEach((keypoint: Keypoint) => {
-                    keyframe.points.push({
-                        name: keypoint.part,
-                        score: keypoint.score,
-                        position: [
-                            keypoint.position.x / source.videoElement.width,
-                            keypoint.position.y / source.videoElement.height,
-                        ]
-                    });
+                    if (keypoint.score >= minConfidence) {
+                        keyframe.points.push({
+                            name: keypoint.part,
+                            score: keypoint.score,
+                            position: [
+                                keypoint.position.x / source.videoElement.width,
+                                keypoint.position.y / source.videoElement.height,
+                            ]
+                        });
+                    }
                 });
                 keyframes.push(keyframe);
             });

@@ -2,11 +2,13 @@ import { Video } from './video-element';
 import { AbstractPoseVisualizer } from './abstractvisualizer';
 import { Events} from './events';
 import { PlaybackEvent } from './playbackevent';
+import {KeyframeEvent} from "./keyframeevent";
 
 export interface Point {
     name?: string;
     score?: number;
-    position: number[];
+    position?: number[];
+    positions?: number[][];
 }
 
 export interface Keyframe {
@@ -24,15 +26,25 @@ export interface PoseRecording {
 }
 
 export class VideoPoseBase extends Video {
+    get poseType() { return 'posebase'; }
+
+    get parts(): string[] { return []; }
+
+    static get observedAttributes() {
+        return [ ...Video.observedAttributes, 'minconfidence' ];
+    }
+
     protected _keyframes: Keyframe[] = [];
 
-    protected hasStarted: boolean = false;
+    protected _minConfidence = Number(this.getAttribute('minconfidence'));
+
+    protected hasStarted = false;
 
     protected audioRecorder?: MediaRecorder;
 
     protected audioData?: string;
 
-    protected forceOneTimePoseProcess: boolean = false;
+    protected forceOneTimePoseProcess = false;
 
     protected recordingStartTime?: number;
 
@@ -45,6 +57,14 @@ export class VideoPoseBase extends Video {
 
     public get keyframes() {
         return this._keyframes.slice();
+    }
+
+    public set minConfidence(percent: number) {
+        this.setAttribute('minconfidence', String(percent));
+    }
+
+    public get minConfidence() {
+        return this._minConfidence;
     }
 
     public get recording(): PoseRecording {
@@ -75,6 +95,14 @@ export class VideoPoseBase extends Video {
             });
         }
 
+        if (keyframes.length > 0) {
+            const event: KeyframeEvent = new KeyframeEvent(
+                this.poseType,
+                keyframes,
+                {bubbles: true, composed: true});
+            this.dispatchEvent(event);
+        }
+
         if (this.isRecording) {
             this._keyframes.push(...keyframes);
         }
@@ -87,7 +115,7 @@ export class VideoPoseBase extends Video {
         super.onTimerUpdate();
     }
 
-    startRecording(includeAudio: boolean = false) {
+    startRecording(includeAudio = false) {
         if (this.isRecording) {
             return;
         }
@@ -111,19 +139,19 @@ export class VideoPoseBase extends Video {
                 this.audioRecorder = new MediaRecorder(audiostream);
                 this.audioRecorder.ondataavailable = (e: any) => {
                     segments.push(e.data);
-                    this.recordedAudio = new Blob(segments);
-                    if (this.recordedAudio) {
-                        const reader = new FileReader();
-                        reader.readAsDataURL(this.recordedAudio);
-                        new Promise(() => {
-                            reader.onloadend = () => {
-                                this.audioData = (reader.result as string).replace('application/octet-stream', 'audio/webm');
-                                this.dispatchEvent(new Event(Events.END_RECORDING, { bubbles: true, composed: true }));
-                            };
-                        });
-                    }
                 }
-                this.audioRecorder.start();
+                this.audioRecorder.onstop = () => {
+                    this.recordedAudio = new Blob(segments);
+                    const reader = new FileReader();
+                    reader.readAsDataURL(this.recordedAudio);
+                    new Promise(() => {
+                        reader.onloadend = () => {
+                            this.audioData = (reader.result as string).replace('application/octet-stream', 'audio/webm');
+                            this.dispatchEvent(new Event(Events.END_RECORDING, { bubbles: true, composed: true }));
+                        };
+                    });
+                }
+                this.audioRecorder.start(1000);
             }
         }
     }
@@ -166,6 +194,15 @@ export class VideoPoseBase extends Video {
                 } else {
                     this.stopRecording();
                 }
+        }
+    }
+
+    protected async attributeChangedCallback(name: string, oldval: any, newval: any) {
+        await super.attributeChangedCallback(name, oldval, newval);
+        switch (name) {
+            case 'minconfidence':
+                this._minConfidence = Number(this.getAttribute('minconfidence'));
+                break;
         }
     }
 }

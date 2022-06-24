@@ -163,6 +163,23 @@ export class Video extends BasePlayer {
         this.videoEl.src = val;
     }
 
+    /**
+     * get video element's natural size
+     */
+    public get naturalSize() {
+        return {
+            width: this.videoEl.videoWidth,
+            height: this.videoEl.videoHeight
+        };
+    }
+
+    /**
+     * aspect ratio of video
+     */
+    public get aspectRatio() {
+        return this.naturalSize.width / this.naturalSize.height;
+    }
+
     protected onEnded() {
         clearInterval(this.timer as number);
         this.dispatchEvent(new Event(Events.VIDEO_END, {bubbles: true, composed: true }));

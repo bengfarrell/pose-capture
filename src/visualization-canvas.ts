@@ -27,9 +27,9 @@ export class VisualizationCanvas extends HTMLElement implements AbstractPoseVisu
 
     public canvasContext?: CanvasRenderingContext2D | null;
 
-    public offsetX: number = 0;
+    public offsetX = 0;
 
-    public offsetY: number = 0;
+    public offsetY = 0;
 
     clear() {
         if (this.canvas && this.canvasContext) {
@@ -59,36 +59,61 @@ export class VisualizationCanvas extends HTMLElement implements AbstractPoseVisu
         if (this.canvasContext && this.canvas) {
             this.canvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.canvasContext.fillStyle = this.dotColor;
+
+            // draw grid to debug where points are
+            // this.drawGrid(10);
             frames.forEach((frame: Keyframe) => {
                 frame.points.forEach((point: Point) => {
-                    const centerX = point.position[0] * (this.canvas?.width || 0);
-                    const centerY = point.position[1] * (this.canvas?.height || 0);
-
-                    // Maybe make the below range configurable?
-                    if (/*frame.bounds.maxZ && frame.bounds.minZ &&*/ this.dotBackColor) {
-                        const depthRange = 1; // frame.bounds.maxZ - frame.bounds.minZ;
-                        const colordiff = ( point.position[2] / depthRange );
-                        const color = VisualizationCanvas.InterpolateColor(this.dotColor, this.dotBackColor, colordiff);
-                        if (this.canvasContext) {
-                            this.canvasContext.fillStyle = color;
-                        }
+                    if (point.position) {
+                        this.drawPoints(point.position);
                     }
-                    this.canvasContext?.beginPath();
-                    this.canvasContext?.arc(centerX, centerY, this.dotSize, 0, 2 * Math.PI, false);
-                    this.canvasContext?.fill();
+                    if (point.positions) {
+                        point.positions.forEach(coord => this.drawPoints(coord));
+                    }
+
                 });
             });
         }
     }
 
-    drawKeyframe(key: Keyframe) {
-        key.points.forEach((point: Point) => {
-            const centerX = point.position[0] * (this.canvas?.width || 0);
-            const centerY = point.position[1] * (this.canvas?.height || 0);
-            this.canvasContext?.beginPath();
-            this.canvasContext?.arc(centerX, centerY, this.dotSize, 0, 2 * Math.PI, false);
-            this.canvasContext?.fill();
-        });
+    drawPoints(coord: number[]) {
+        const centerX = coord[0] * (this.canvas?.width || 0);
+        const centerY = coord[1] * (this.canvas?.height || 0);
+
+        // Maybe make the below range configurable?
+        if (/*frame.bounds.maxZ && frame.bounds.minZ &&*/ this.dotBackColor) {
+            const depthRange = 1; // frame.bounds.maxZ - frame.bounds.minZ;
+            const colordiff = ( coord[2] / depthRange );
+            const color = VisualizationCanvas.InterpolateColor(this.dotColor, this.dotBackColor, colordiff);
+            if (this.canvasContext) {
+                this.canvasContext.fillStyle = color;
+            }
+        }
+        this.canvasContext?.beginPath();
+        this.canvasContext?.arc(centerX, centerY, this.dotSize, 0, 2 * Math.PI, false);
+        this.canvasContext?.fill();
+    }
+
+    /**
+     * debug method in case point positions need to be scrutinized
+     */
+    drawGrid() {
+        if (this.canvasContext && this.canvas) {
+            this.canvasContext.strokeStyle = '#ffff00';
+            for (let c = 0; c < this.canvas.width; c += 10) {
+                this.canvasContext.beginPath();
+                this.canvasContext.moveTo(c, 0);
+                this.canvasContext.lineTo(c, this.canvas.height);
+                this.canvasContext.stroke();
+            }
+
+            for (let c = 0; c < this.canvas.height; c += 10) {
+                this.canvasContext.beginPath();
+                this.canvasContext.moveTo(0, c);
+                this.canvasContext.lineTo(this.canvas.width, c);
+                this.canvasContext.stroke();
+            }
+        }
     }
 
     constructor() {
@@ -145,7 +170,7 @@ export class VisualizationCanvas extends HTMLElement implements AbstractPoseVisu
         const mc0 = c0.substr(1, c0.length).match(/.{1,2}/g)?.map((oct)=>parseInt(oct, 16) * (1-f));
         const mc1 = c1.substr(1, c1.length).match(/.{1,2}/g)?.map((oct)=>parseInt(oct, 16) * f);
         if (mc0 && mc1) {
-            let ci = [0, 1, 2].map(i => Math.min(Math.round(mc0[i] + mc1[i]), 255));
+            const ci = [0, 1, 2].map(i => Math.min(Math.round(mc0[i] + mc1[i]), 255));
             return `#${ci.reduce((a, v) => ((a << 8) + v), 0).toString(16).padStart(6, "0")}`;
         } else {
             return '#000000';

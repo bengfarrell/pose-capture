@@ -136,7 +136,7 @@ var hands$1 = /*#__PURE__*/Object.freeze({
 
 var require$$0$1 = /*@__PURE__*/getAugmentedNamespace(hands$1);
 
-var constants$3 = {};
+var constants$4 = {};
 
 /**
  * @license
@@ -154,8 +154,8 @@ var constants$3 = {};
  * limitations under the License.
  * =============================================================================
  */
-Object.defineProperty(constants$3, "__esModule", { value: true });
-constants$3.MEDIAPIPE_KEYPOINTS = [
+Object.defineProperty(constants$4, "__esModule", { value: true });
+var MEDIAPIPE_KEYPOINTS = constants$4.MEDIAPIPE_KEYPOINTS = [
     'wrist',
     'thumb_cmc',
     'thumb_mcp',
@@ -178,6 +178,12 @@ constants$3.MEDIAPIPE_KEYPOINTS = [
     'pinky_finger_dip',
     'pinky_finger_tip',
 ];
+
+var constants$3 = /*#__PURE__*/_mergeNamespaces({
+	__proto__: null,
+	MEDIAPIPE_KEYPOINTS: MEDIAPIPE_KEYPOINTS,
+	'default': constants$4
+}, [constants$4]);
 
 var detector_utils$1 = {};
 
@@ -317,7 +323,7 @@ Object.defineProperty(detector$1, "__esModule", { value: true });
  * =============================================================================
  */
 var hands = require$$0$1;
-var constants_1$2 = constants$3;
+var constants_1$2 = constants$4;
 var detector_utils_1$1 = detector_utils$1;
 /**
  * MediaPipe detector class.
@@ -42909,7 +42915,7 @@ var __generator$1 = (commonjsGlobal && commonjsGlobal.__generator) || function (
 Object.defineProperty(detector, "__esModule", { value: true });
 var tfconv = require$$0;
 var tf = require$$1;
-var constants_1 = constants$3;
+var constants_1 = constants$4;
 var association_norm_rect_1 = association_norm_rect;
 var calculate_landmark_projection_1 = calculate_landmark_projection;
 var calculate_world_landmark_projection_1 = calculate_world_landmark_projection;
@@ -43359,4 +43365,4 @@ var index$1 = /*#__PURE__*/_mergeNamespaces({
 	'default': index
 }, [dist$2]);
 
-export { index$1 as handpose };
+export { constants$3 as constants, index$1 as handpose };

@@ -1,9 +1,10 @@
 import { html, css, LitElement, svg } from 'lit';
 import {customElement, state, query} from 'lit/decorators.js';
 import '../poseplayer';
-// import '../facelandmark-video';
+import '../facelandmark-video';
 import '../bodypix-video';
 import '../handpose-video';
+import '../posedetection-video';
 import '../visualization-canvas';
 import '../ui/playbackcontrols';
 import {PoseRecording, VideoPoseBase} from "../videopose-element";
@@ -11,6 +12,7 @@ import '../video-element';
 import {BasePlayer} from "../baseplayer";
 import {Events} from "../events";
 import PosePlayer from "../poseplayer";
+import {KeyframeEvent} from "../keyframeevent";
 
 
 // Download by jenya from NounProject.com
@@ -51,6 +53,14 @@ export class DemoApp extends LitElement {
         padding-left: 0;
         padding-right: 0;
       }
+      
+      label {
+        font-size: 10px;
+      }
+
+      #coords-log {
+        font-size: 11px;
+      }
 
       #player {
         width: 100%;
@@ -63,6 +73,10 @@ export class DemoApp extends LitElement {
         width: 100%;
         height: calc(100% - 57px);
         display: flex;
+      }
+      
+      #source-label {
+        margin-left: 20px;
       }
 
       #recordings-container {
@@ -105,27 +119,61 @@ export class DemoApp extends LitElement {
     @state()
     selected?: string;
 
-    recordings: Recording[] = [{
-        keyframes: [],
-        duration: 1999,
-        timestamp: Date.now(),
-        name: 'hi'
-    }];
+    @state()
+    availableParts: string[] = [];
+
+    sources = [
+        './sampleassets/conan.mp4',
+        './sampleassets/conan-face.mp4',
+        './sampleassets/piano.mp4',
+        'camera'
+    ];
+
+    @state()
+    currentSource = this.sources[0];
+
+    @state()
+    minConfidence = 0;
+
+    recordings: Recording[] = [];
+
+    samples: String[] = [
+        'conan-bodypix.json',
+        'conan-posedetection.json',
+        'conan-facelandmark.json',
+        'piano.json'
+    ]
 
     pendingRecording?: Recording;
+
+    currentPoseFile?: String;
 
     @query('#player')
     player?: PosePlayer | VideoPoseBase
 
+    @query('#parts-list')
+    partsList?: HTMLInputElement;
 
+    @query('#coords-log')
+    coordsLog?: HTMLSpanElement;
 
     constructor() {
         super();
         this.addEventListener(Events.READY, () => {
             if (this.selected === 'pose' && this.player && this.pendingRecording) {
                 (this.player as PosePlayer).recording = this.pendingRecording;
+            } else {
+                this.availableParts = (this.player as VideoPoseBase).parts;
             }
-        })
+        });
+
+        this.addEventListener(KeyframeEvent.EventName, ((event: KeyframeEvent) => {
+            const part = this.partsList?.value;
+            if (part && this.coordsLog) {
+                const coords = event.getPartLocation(part)?.position || [0, 0, 0];
+                this.coordsLog.innerText = `${coords[0].toFixed(2)}, ${coords[1].toFixed(2)}, ${coords[2].toFixed(2)}`;
+            }
+        }) as EventListenerOrEventListenerObject);
     }
 
     protected onRecordingFinished(e: Event) {
@@ -134,18 +182,11 @@ export class DemoApp extends LitElement {
             name: this.selected as string,
             timestamp: Date.now(),
             keyframes: recording.keyframes,
-            duration: recording.duration
+            duration: recording.duration,
+            audio: recording.audio
 
         });
         this.requestUpdate('recordings');
-        /* const link = document.createElement('a');
-        const data = `data:text/json;charset=utf-8,${
-            encodeURIComponent( JSON.stringify(
-                (e.target as VideoPoseBase).recording)
-            )}`;
-        link.setAttribute('download', 'posedata.json');
-        link.setAttribute('href', data);
-        link.click(); */
     }
 
     select(player: string) {
@@ -157,31 +198,70 @@ export class DemoApp extends LitElement {
         this.selected = 'pose';
     }
 
-    public XXXrender() {
-        return html`
-            <bodypix-video
-                id="video" xcamera source="./sampleassets/conan.mp4"
-                @endrecording=${this.onRecordingFinished}>
-            <visualization-canvas dotcolor="#ff0000" dotbackcolor="#000000"></visualization-canvas>
-            <pose-playback-controls></pose-playback-controls>
-        </bodypix-video>`;
+    loadRecordingFromFile(file: String) {
+        this.currentPoseFile = `./sampleassets/${file}`;
+        this.selected = 'pose';
+    }
+
+    downloadRecording(recording: Recording) {
+        const link = document.createElement('a');
+        const data = `data:text/json;charset=utf-8,${
+            encodeURIComponent( JSON.stringify(recording)
+            )}`;
+        link.setAttribute('download', `${recording.name}-${recording.timestamp}.json`);
+        link.setAttribute('href', data);
+        link.click();
     }
 
     render() {
         return html`<header>
-            <button ?selected=${this.selected === 'body'} @click=${() => this.select('body')}>Body</button>
-            <button ?selected=${this.selected === 'hands'} @click=${() => this.select('hands')}>Hands</button>
-            <button ?selected=${this.selected === 'face'} @click=${() => this.select('face')}>Face</button>
+            <button ?selected=${this.selected === 'posedetection'} @click=${() => this.select('posedetection')}>PoseDetection</button>
+            <button ?selected=${this.selected === 'bodypix'} @click=${() => this.select('bodypix')}>BodyPix</button>
+            <button ?selected=${this.selected === 'handpose'} @click=${() => this.select('handpose')}>HandPose</button>
+            <button ?selected=${this.selected === 'facelandmark'} @click=${() => this.select('facelandmark')}>Face Landmark</button>
+            
+            <label id="source-label">Capture pose from:</label>
+            <select value=${this.currentSource} @change=${(event: InputEvent) => {
+                this.currentSource = (event.target as HTMLInputElement).value;
+            }}>
+                ${this.sources.map((item) => {
+                    return html`<option>${item}</option>`;
+                })}
+            </select>
+
+            <label id="source-label">Log points for:</label>
+            <select id="parts-list">
+                ${this.availableParts.map((part: string) => {
+                    return html`<option>${part}</option>`;
+                })}
+            </select>
+            <span id="coords-log"></span>
         </header>
         <div id="main">
             <div id="recordings-container">
+                <input type="range" min="0" max="100" @input=${(e: InputEvent) => {
+                    this.minConfidence = Number((e.target as HTMLInputElement).value);
+                }} value=${this.minConfidence} />
+                <label>Minimum Pose Confidence ${this.minConfidence}%</label>
+
+                <h3>Samples</h3>
+                ${this.samples.map((file: String) => {
+                    return html`<div class="recording-btn">
+                        <button class="load" @click=${() => this.loadRecordingFromFile(file)}>
+                            ${file}
+                        </button>
+                    </div>`;
+                })}
+                
                 <h3>Recordings</h3>
                 ${this.recordings.map((recording: Recording) => {
-                    return html`<div class="recording-btn"><button class="load" @click=${() => { this.loadRecording(recording)}}>
-                        ${recording.name} - ${BasePlayer.formatTime(recording.duration)}
-                        <br />
-                        ${new Date(recording.timestamp).toLocaleTimeString()}
-                    </button><button class="download">${download_icon}</button></div>`;
+                    return html`<div class="recording-btn">
+                        <button class="load" @click=${() => this.loadRecording(recording)}>
+                            ${recording.name} - ${BasePlayer.formatTime(recording.duration)}<br />
+                            ${new Date(recording.timestamp).toLocaleTimeString()}
+                        </button>
+                        <button class="download" @click=${() => this.downloadRecording(recording) }>${download_icon}</button>
+                    </div>`;
                 })}
             </div>
             ${this.renderPlayer()}
@@ -190,39 +270,66 @@ export class DemoApp extends LitElement {
 
     renderPlayer() {
         switch (this.selected) {
-            case 'body':
+            case 'bodypix':
                 return html`
-                    <bodypix-video id="player" camera @endrecording=${this.onRecordingFinished}>
+                    <bodypix-video 
+                            id="player"
+                            source=${this.currentSource}
+                            ?camera=${this.currentSource === 'camera'}
+                            minconfidence=${this.minConfidence} 
+                            @endrecording=${this.onRecordingFinished}>
                         <visualization-canvas dotcolor="#ff0000" dotbackcolor="#000000"></visualization-canvas>
                         <pose-playback-controls></pose-playback-controls>
                     </bodypix-video>`;
                 break;
 
-            case 'hands':
+            case 'posedetection':
                 return html`
-                    <handpose-video id="player" camera @endrecording=${this.onRecordingFinished}>
+                    <posedetection-video
+                            id="player" 
+                            source=${this.currentSource} 
+                            ?camera=${this.currentSource === 'camera'}
+                            minconfidence=${this.minConfidence} 
+                            @endrecording=${this.onRecordingFinished}>
+                        <visualization-canvas dotcolor="#ff0000" dotbackcolor="#000000"></visualization-canvas>
+                        <pose-playback-controls></pose-playback-controls>
+                    </posedetection-video>`;
+                break;
+
+            case 'facelandmark':
+                return html`
+                    <facelandmark-video
+                            id="player"
+                            source=${this.currentSource}
+                            ?camera=${this.currentSource === 'camera'}
+                            minconfidence=${this.minConfidence}
+                            @endrecording=${this.onRecordingFinished}>
+                        <visualization-canvas dotcolor="#ff0000" dotbackcolor="#000000"></visualization-canvas>
+                        <pose-playback-controls></pose-playback-controls>
+                    </-video>`;
+                break;
+
+            case 'handpose':
+                return html`
+                    <handpose-video 
+                            id="player"
+                            source=${this.currentSource}
+                            ?camera=${this.currentSource === 'camera'}
+                            minconfidence=${this.minConfidence}
+                            @endrecording=${this.onRecordingFinished}>
                         <visualization-canvas dotcolor="#ff0000" dotbackcolor="#000000"></visualization-canvas>
                         <pose-playback-controls></pose-playback-controls>
                     </handpose-video>`;
                 break;
 
             case 'pose':
-                return html`<pose-player id="player" autoplay islooping>
+                return html`<pose-player id="player" autoplay posedata=${this.currentPoseFile} islooping>
                     <visualization-canvas dotcolor="#ff0000" dotbackcolor="#000000"></visualization-canvas>
                     <pose-playback-controls></pose-playback-controls>
                 </pose-player>`;
 
-
             default:
                 return undefined;
         }
-    }
-
-
-    renderPoseVideo() {
-        return html`<pose-player id="video" autoplay islooping posedata="./sampleassets/posedata.json">
-            <visualization-canvas dotcolor="#ff0000" dotbackcolor="#000000"></visualization-canvas>
-            <pose-playback-controls></pose-playback-controls>
-        </pose-player>`;
     }
 }

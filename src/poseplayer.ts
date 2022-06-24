@@ -22,7 +22,6 @@ export default class PosePlayer extends BasePlayer {
     protected timer?: number;
 
     public set recording(rec: PoseRecording) {
-        console.log('set recording', rec)
         this.keyframes = rec.keyframes;
         // temporarily massage times such that we start with 0
         const firstKeyTime = rec.keyframes[0].time;
@@ -76,7 +75,10 @@ export default class PosePlayer extends BasePlayer {
             </style>
             <slot></slot>`;
         }
+    }
 
+    protected connectedCallback() {
+        super.connectedCallback();
         if (this.hasAttribute('posedata')) {
             this.loadPoseData(this.getAttribute('posedata') as string);
         }
@@ -167,9 +169,10 @@ export default class PosePlayer extends BasePlayer {
     }
 
     public set currentTime(val) {
+        this.playStartTime = Date.now() - val;
         this._currentTime = val;
         if (this.audio) {
-            this.audio.currentTime = val;
+            this.audio.currentTime = val / 1000;
         }
 
         if (this.keyframes.length > 0) {
@@ -183,7 +186,7 @@ export default class PosePlayer extends BasePlayer {
             return 0;
         }
 
-        let range = _range ? [_range[0], _range[1]] : [ 0, keyframes.length-1 ];
+        const range = _range ? [_range[0], _range[1]] : [ 0, keyframes.length-1 ];
         if (range[1] - range[0] <= 1) {
             return keyframes[range[1]].time - time < time - keyframes[range[0]].time ? range[1] : range[0];
         }
@@ -224,7 +227,6 @@ export default class PosePlayer extends BasePlayer {
     protected disconnectedCallback() {
         clearInterval(this.timer as number);
     }
-
 }
 
 customElements.define('pose-player', PosePlayer);

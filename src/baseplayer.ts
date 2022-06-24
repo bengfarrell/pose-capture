@@ -97,7 +97,7 @@ export class BasePlayer extends HTMLElement implements Player {
     /**
      * is video playing?
      */
-    protected _isPlaying: boolean = false;
+    protected _isPlaying = false;
 
     public get isPlaying() {
         return this._isPlaying;
@@ -106,7 +106,7 @@ export class BasePlayer extends HTMLElement implements Player {
     /**
      * is recording?
      */
-    protected _isRecording: boolean = false;
+    protected _isRecording = false;
 
     public get isRecording() {
         return this._isRecording;
@@ -115,7 +115,7 @@ export class BasePlayer extends HTMLElement implements Player {
     /**
      * is audio recording?
      */
-    protected _isAudioRecording: boolean = false;
+    protected _isAudioRecording = false;
 
     public get isAudioRecording() {
         return this._isAudioRecording;
@@ -137,7 +137,7 @@ export class BasePlayer extends HTMLElement implements Player {
     /**
      * video duration
      */
-    protected _duration: number = 0;
+    protected _duration = 0;
 
     public get duration() {
         return this._duration;

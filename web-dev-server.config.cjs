@@ -9,6 +9,7 @@ module.exports = {
     port: 8080,
     watch: true,
     nodeResolve: true,
+    open: 'index.html',
     preserveSymlinks: true,
     middlewares: [ range ],
     plugins: [

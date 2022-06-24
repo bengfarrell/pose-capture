@@ -14,31 +14,35 @@ export const load = async function() {
     });
 }
 
-export const processFrame = async (source: VideoPoseBase) => {
+export const processFrame = async (source: VideoPoseBase, recordingStartTime = 0, minConfidence = 0) => {
     const keyframes: Keyframe[] = [];
     if (detector) {
         const poses = await detector.estimatePoses(source.videoElement);
         if (poses) {
             poses.forEach((pose: Pose, index: number) => {
                 const keyframe: Keyframe = {
-                    time: Date.now(),
+                    time: Date.now() - recordingStartTime,
                     score: pose.score,
                     pose: index,
                     points: [],
                     aspectRatio: source.aspectRatio
                 }
                 pose.keypoints?.forEach((keypoint: Keypoint) => {
-                    keyframe.points.push({
-                        name: keypoint.name,
-                        score: keypoint.score,
-                        position: [
-                            keypoint.x / source.naturalSize.width,
-                            keypoint.y / source.naturalSize.height,
-                            keypoint.z as number
-                        ]
-                    });
+                    if (keypoint.score && keypoint.score >= minConfidence) {
+                        keyframe.points.push({
+                            name: keypoint.name,
+                            score: keypoint.score,
+                            position: [
+                                keypoint.x / source.naturalSize.width,
+                                keypoint.y / source.naturalSize.height,
+                                keypoint.z as number
+                            ]
+                        });
+                    }
                 });
-                keyframes.push(keyframe);
+                if (keyframe.points.length > 0) {
+                    keyframes.push(keyframe);
+                }
             });
         }
     }
